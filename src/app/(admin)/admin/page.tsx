@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import TenantActions from '@/components/admin/TenantActions'
 
 export default async function AdminPage() {
   const supabase = await createServerSupabaseClient()
@@ -28,6 +29,7 @@ export default async function AdminPage() {
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Plano</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Criado em</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -50,11 +52,14 @@ export default async function AdminPage() {
                   <td className="px-4 py-3 text-gray-500">
                     {new Date(tenant.created_at).toLocaleDateString('pt-BR')}
                   </td>
+                  <td className="px-4 py-3">
+                    <TenantActions tenantId={tenant.id} isActive={tenant.is_active} />
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
                   Nenhum tenant cadastrado ainda.
                 </td>
               </tr>
