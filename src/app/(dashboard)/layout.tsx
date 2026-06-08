@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LogoutButton from '@/components/dashboard/LogoutButton'
 
 export default function DashboardLayout({
   children,
@@ -27,6 +28,9 @@ export default function DashboardLayout({
             Serviços
           </Link>
         </nav>
+        <div className="p-3 border-t border-gray-200">
+          <LogoutButton />
+        </div>
       </aside>
 
       {/* Conteúdo */}
