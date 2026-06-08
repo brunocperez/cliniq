@@ -1,0 +1,168 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+
+interface Servico {
+  id: string
+  name: string
+}
+
+interface Paciente {
+  id: string
+  name: string
+  phone: string
+}
+
+export default function NovaConsultaPage() {
+  const router = useRouter()
+  const supabase = createClient()
+
+  const [servicos, setServicos] = useState<Servico[]>([])
+  const [pacientes, setPacientes] = useState<Paciente[]>([])
+  const [servicoId, setServicoId] = useState('')
+  const [pacienteId, setPacienteId] = useState('')
+  const [data, setData] = useState('')
+  const [hora, setHora] = useState('')
+  const [erro, setErro] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    async function carregar() {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('tenant_id')
+        .single()
+
+      const { data: s } = await supabase
+        .from('services')
+        .select('id, name')
+        .eq('tenant_id', profile?.tenant_id)
+
+      const { data: p } = await supabase
+        .from('patients')
+        .select('id, name, phone')
+        .eq('tenant_id', profile?.tenant_id)
+
+      setServicos(s ?? [])
+      setPacientes(p ?? [])
+    }
+    carregar()
+  }, [])
+
+  async function handleCriar() {
+    setErro('')
+    setLoading(true)
+
+    if (!pacienteId || !data || !hora) {
+      setErro('Preencha paciente, data e hora.')
+      setLoading(false)
+      return
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tenant_id')
+      .single()
+
+    const scheduledAt = new Date(`${data}T${hora}:00`).toISOString()
+
+    const { error } = await supabase
+      .from('appointments')
+      .insert({
+        tenant_id: profile?.tenant_id,
+        patient_id: pacienteId,
+        service_id: servicoId || null,
+        scheduled_at: scheduledAt,
+        status: 'agendado',
+      })
+
+    if (error) {
+      setErro('Erro ao criar consulta.')
+      setLoading(false)
+      return
+    }
+
+    router.push('/dashboard/agenda')
+  }
+
+  return (
+    <div className="max-w-md">
+      <div className="mb-6">
+        <a href="/dashboard/agenda" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
+        <h1 className="text-lg font-medium mt-2">Nova consulta</h1>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col gap-4">
+
+        {erro && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm">
+            {erro}
+          </div>
+        )}
+
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Paciente</label>
+          <select
+            value={pacienteId}
+            onChange={e => setPacienteId(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          >
+            <option value="">Selecione um paciente</option>
+            {pacientes.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.name ?? p.phone}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Serviço</label>
+          <select
+            value={servicoId}
+            onChange={e => setServicoId(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          >
+            <option value="">Selecione um serviço (opcional)</option>
+            {servicos.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Data</label>
+          <input
+            type="date"
+            value={data}
+            onChange={e => setData(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">Hora</label>
+          <input
+            type="time"
+            value={hora}
+            onChange={e => setHora(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          />
+        </div>
+
+        <button
+          onClick={handleCriar}
+          disabled={loading}
+          className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
+        >
+          {loading ? 'Salvando...' : 'Agendar consulta'}
+        </button>
+
+      </div>
+    </div>
+  )
+}
