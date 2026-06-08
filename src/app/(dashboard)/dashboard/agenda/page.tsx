@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import ConsultaActions from '@/components/dashboard/ConsultaActions'
 
 export default async function AgendaPage() {
   const supabase = await createServerSupabaseClient()
@@ -33,6 +34,7 @@ export default async function AgendaPage() {
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Paciente</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Data e hora</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -62,11 +64,14 @@ export default async function AgendaPage() {
                       {consulta.status}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <ConsultaActions consultaId={consulta.id} statusAtual={consulta.status} />
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
                   Nenhuma consulta agendada ainda.
                 </td>
               </tr>

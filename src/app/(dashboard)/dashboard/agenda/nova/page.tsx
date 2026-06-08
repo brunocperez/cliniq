@@ -29,6 +29,8 @@ export default function NovaConsultaPage() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    const supabase = createClient()
+    
     async function carregar() {
       const { data: profile } = await supabase
         .from('profiles')
