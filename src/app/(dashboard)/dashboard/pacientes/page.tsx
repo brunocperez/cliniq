@@ -33,7 +33,11 @@ export default async function PacientesPage() {
             {pacientes && pacientes.length > 0 ? (
               pacientes.map((paciente) => (
                 <tr key={paciente.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3 font-medium">{paciente.name ?? '—'}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <a href={`/dashboard/pacientes/${paciente.id}`} className="hover:text-blue-600">
+                      {paciente.name ?? '—'}
+                    </a>
+                  </td>
                   <td className="px-4 py-3 text-gray-500">{paciente.phone}</td>
                   <td className="px-4 py-3 text-gray-500">
                     {new Date(paciente.created_at).toLocaleDateString('pt-BR')}
