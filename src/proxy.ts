@@ -1,8 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request })
+export async function proxy(request: NextRequest) {
+  const response = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,12 +23,10 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  // Se não está logado e tenta acessar área protegida → vai pro login
   if (!user && (path.startsWith('/dashboard') || path.startsWith('/admin'))) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Se já está logado e tenta acessar o login → vai pro dashboard
   if (user && path === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
