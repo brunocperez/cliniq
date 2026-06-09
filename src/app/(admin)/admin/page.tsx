@@ -1,27 +1,25 @@
+import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import TenantActions from '@/components/admin/TenantActions'
 
 export default async function AdminPage() {
   const supabase = await createServerSupabaseClient()
 
-  const { data: tenants, error } = await supabase
+  const { data: tenants } = await supabase
     .from('tenants')
     .select('*, profiles(id, full_name)')
     .order('created_at', { ascending: false })
-
-  console.log('tenants:', tenants)
-  console.log('error:', error)
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-lg font-medium">Tenants</h1>
-        <a
+        <Link
           href="/admin/tenants/novo"
           className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:opacity-90"
         >
-          + Novo tenant
-        </a>
+          + Novo acesso
+        </Link>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -43,7 +41,11 @@ export default async function AdminPage() {
 
                 return (
                   <tr key={tenant.id} className="border-b border-gray-100 last:border-0">
-                    <td className="px-4 py-3 font-medium">{tenant.name}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <Link href={`/admin/tenants/${tenant.id}`} className="hover:text-blue-600">
+                        {tenant.name}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">
                       {tenant.is_active ? (
                         <span className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
@@ -71,7 +73,7 @@ export default async function AdminPage() {
               })
             ) : (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
                   Nenhum tenant cadastrado ainda.
                 </td>
               </tr>
