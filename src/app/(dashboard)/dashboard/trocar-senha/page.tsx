@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import PasswordInput, { senhaValida } from '@/components/ui/PasswordInput'
 
 export default function TrocarSenhaPage() {
   const supabase = createClient()
@@ -14,8 +15,8 @@ export default function TrocarSenhaPage() {
   async function handleTrocar() {
     setErro('')
 
-    if (novaSenha.length < 6) {
-      setErro('A senha deve ter pelo menos 6 caracteres.')
+    if (!senhaValida(novaSenha)) {
+      setErro('A senha não atende aos requisitos mínimos.')
       return
     }
 
@@ -61,13 +62,10 @@ export default function TrocarSenhaPage() {
         )}
 
         <div className="mb-4">
-          <label className="block text-xs text-gray-500 mb-1">Nova senha</label>
-          <input
-            type="password"
+          <PasswordInput
+            label="Nova senha"
             value={novaSenha}
-            onChange={e => setNovaSenha(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            onChange={setNovaSenha}
           />
         </div>
 
