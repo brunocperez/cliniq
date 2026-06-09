@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import PhoneInput from '@/components/ui/PhoneInput'
 
 const especialidades = [
   'Odontologia',
@@ -116,11 +117,9 @@ export default function EditarTenantPage() {
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">WhatsApp do consultório</label>
-            <input
-              type="text"
+            <PhoneInput
               value={whatsappConsultorio}
-              onChange={e => setWhatsappConsultorio(e.target.value)}
-              placeholder="Ex: 11999999999"
+              onChange={setWhatsappConsultorio}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
             />
           </div>
@@ -141,11 +140,9 @@ export default function EditarTenantPage() {
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">WhatsApp do responsável</label>
-            <input
-              type="text"
+            <PhoneInput
               value={whatsappResponsavel}
-              onChange={e => setWhatsappResponsavel(e.target.value)}
-              placeholder="Ex: 11999999999"
+              onChange={setWhatsappResponsavel}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
             />
           </div>
