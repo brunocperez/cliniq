@@ -31,14 +31,24 @@ export default async function TenantDetalhesPage({ params }: { params: Promise<{
     <div className="max-w-lg">
       <div className="mb-6">
         <a href="/admin" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
-        <h1 className="text-lg font-medium mt-2">{tenant.name}</h1>
-        <span className={`text-xs px-2 py-0.5 rounded-full ${
-          tenant.is_active
-            ? 'bg-green-50 text-green-700'
-            : 'bg-red-50 text-red-700'
-        }`}>
-          {tenant.is_active ? 'ativo' : 'bloqueado'}
-        </span>
+        <div className="flex items-center justify-between mt-2">
+          <div>
+            <h1 className="text-lg font-medium">{tenant.name}</h1>
+            <span className={`text-xs px-2 py-0.5 rounded-full ${
+              tenant.is_active
+                ? 'bg-green-50 text-green-700'
+                : 'bg-red-50 text-red-700'
+            }`}>
+              {tenant.is_active ? 'ativo' : 'bloqueado'}
+            </span>
+          </div>
+          <a
+            href={`/admin/tenants/${id}/editar`}
+            className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:opacity-90"
+          >
+            Editar
+          </a>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
