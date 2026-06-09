@@ -7,7 +7,6 @@ export default function NovoTenantPage() {
   const router = useRouter()
 
   const [nome, setNome] = useState('')
-  const [plano, setPlano] = useState('essencial')
   const [email, setEmail] = useState('')
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,7 +21,7 @@ export default function NovoTenantPage() {
     const res = await fetch('/api/tenants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, plano, email }),
+      body: JSON.stringify({ nome, plano: 'essencial', email }),
     })
 
     const data = await res.json()
@@ -43,7 +42,7 @@ export default function NovoTenantPage() {
     setTimeout(() => setCopiado(false), 2000)
   }
 
-  function handleBaixarPDF() {
+  function handleBaixarTxt() {
     const conteudo = `
 ClinicSaaS — Dados de Acesso
 =============================
@@ -106,7 +105,7 @@ Atenção: troque sua senha no primeiro acesso.
               {copiado ? 'Copiado!' : 'Copiar credenciais'}
             </button>
             <button
-              onClick={handleBaixarPDF}
+              onClick={handleBaixarTxt}
               className="flex-1 text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
             >
               Baixar .txt
@@ -132,7 +131,7 @@ Atenção: troque sua senha no primeiro acesso.
     <div className="max-w-md">
       <div className="mb-6">
         <a href="/admin" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
-        <h1 className="text-lg font-medium mt-2">Novo tenant</h1>
+        <h1 className="text-lg font-medium mt-2">Novo acesso</h1>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col gap-4">
@@ -155,18 +154,6 @@ Atenção: troque sua senha no primeiro acesso.
         </div>
 
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Plano</label>
-          <select
-            value={plano}
-            onChange={e => setPlano(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          >
-            <option value="essencial">Essencial</option>
-            <option value="pro">Pro</option>
-          </select>
-        </div>
-
-        <div>
           <label className="block text-xs text-gray-500 mb-1">E-mail de acesso</label>
           <input
             type="email"
@@ -186,7 +173,7 @@ Atenção: troque sua senha no primeiro acesso.
           disabled={loading}
           className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
         >
-          {loading ? 'Criando...' : 'Criar tenant'}
+          {loading ? 'Criando...' : 'Criar acesso'}
         </button>
 
       </div>

@@ -29,7 +29,6 @@ export default async function AdminPage() {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Nome</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Plano</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Criado em</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
@@ -45,7 +44,6 @@ export default async function AdminPage() {
                 return (
                   <tr key={tenant.id} className="border-b border-gray-100 last:border-0">
                     <td className="px-4 py-3 font-medium">{tenant.name}</td>
-                    <td className="px-4 py-3 text-gray-500">{tenant.plan}</td>
                     <td className="px-4 py-3">
                       {tenant.is_active ? (
                         <span className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
