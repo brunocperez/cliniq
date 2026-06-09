@@ -16,7 +16,7 @@ function gerarSenha() {
 }
 
 export async function POST(request: NextRequest) {
-  const { nome, plano, email } = await request.json()
+  const { nome, plano, email, especialidade, whatsappConsultorio, nomeResponsavel, whatsappResponsavel } = await request.json()
 
   const cookieStore = await cookies()
   const supabase = createServerClient(
@@ -52,7 +52,12 @@ export async function POST(request: NextRequest) {
   // 1. Cria o tenant
   const { data: tenant, error: tenantError } = await adminSupabase
     .from('tenants')
-    .insert({ name: nome, plan: plano })
+    .insert({
+      name: nome,
+      plan: plano,
+      specialty: especialidade,
+      whatsapp_consultorio: whatsappConsultorio,
+    })
     .select()
     .single()
 
@@ -83,6 +88,8 @@ export async function POST(request: NextRequest) {
       tenant_id: tenant.id,
       role: 'client',
       full_name: nome,
+      responsible_name: nomeResponsavel,
+      whatsapp_responsavel: whatsappResponsavel,
       first_login: true,
     })
 
@@ -101,7 +108,6 @@ export async function POST(request: NextRequest) {
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
         <h2 style="font-size: 20px; font-weight: 500;">Bem-vindo ao ClinicSaaS!</h2>
         <p style="color: #555;">Seu consultório <strong>${nome}</strong> foi cadastrado com sucesso.</p>
-        <p style="color: #555;"><strong>Seus dados de acesso:</strong></p>
         <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
           <p style="margin: 0 0 8px;"><strong>E-mail:</strong> ${email}</p>
           <p style="margin: 0;"><strong>Senha temporária:</strong> <code>${senha}</code></p>

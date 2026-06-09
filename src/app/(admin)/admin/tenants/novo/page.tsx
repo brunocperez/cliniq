@@ -2,11 +2,31 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PhoneInput from '@/components/ui/PhoneInput'
+
+const especialidades = [
+  'Odontologia',
+  'Psicologia',
+  'Fisioterapia',
+  'Nutrição',
+  'Fonoaudiologia',
+  'Dermatologia',
+  'Cardiologia',
+  'Ortopedia',
+  'Ginecologia',
+  'Pediatria',
+  'Clínica Geral',
+  'Outra',
+]
 
 export default function NovoTenantPage() {
   const router = useRouter()
 
-  const [nome, setNome] = useState('')
+  const [nomeConsultorio, setNomeConsultorio] = useState('')
+  const [especialidade, setEspecialidade] = useState('')
+  const [whatsappConsultorio, setWhatsappConsultorio] = useState('')
+  const [nomeResponsavel, setNomeResponsavel] = useState('')
+  const [whatsappResponsavel, setWhatsappResponsavel] = useState('')
   const [email, setEmail] = useState('')
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,12 +36,26 @@ export default function NovoTenantPage() {
 
   async function handleCriar() {
     setErro('')
+
+    if (!nomeConsultorio || !especialidade || !whatsappConsultorio || !nomeResponsavel || !whatsappResponsavel || !email) {
+      setErro('Preencha todos os campos.')
+      return
+    }
+
     setLoading(true)
 
     const res = await fetch('/api/tenants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, plano: 'essencial', email }),
+      body: JSON.stringify({
+        nome: nomeConsultorio,
+        plano: 'essencial',
+        email,
+        especialidade,
+        whatsappConsultorio,
+        nomeResponsavel,
+        whatsappResponsavel,
+      }),
     })
 
     const data = await res.json()
@@ -46,7 +80,7 @@ export default function NovoTenantPage() {
     const conteudo = `
 ClinicSaaS — Dados de Acesso
 =============================
-Consultório: ${nome}
+Consultório: ${nomeConsultorio}
 E-mail: ${email}
 Senha temporária: ${senhaGerada}
 
@@ -59,7 +93,7 @@ Atenção: troque sua senha no primeiro acesso.
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `acesso-${nome.toLowerCase().replace(/\s+/g, '-')}.txt`
+    a.download = `acesso-${nomeConsultorio.toLowerCase().replace(/\s+/g, '-')}.txt`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -134,49 +168,94 @@ Atenção: troque sua senha no primeiro acesso.
         <h1 className="text-lg font-medium mt-2">Novo acesso</h1>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col gap-4">
+      {erro && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">
+          {erro}
+        </div>
+      )}
 
-        {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm">
-            {erro}
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+        <h2 className="text-sm font-medium mb-4">Dados do consultório</h2>
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Nome do consultório</label>
+            <input
+              type="text"
+              value={nomeConsultorio}
+              onChange={e => setNomeConsultorio(e.target.value)}
+              placeholder="Ex: Clínica Dra. Ana"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            />
           </div>
-        )}
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Nome do consultório</label>
-          <input
-            type="text"
-            value={nome}
-            onChange={e => setNome(e.target.value)}
-            placeholder="Ex: Clínica Dra. Ana"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Especialidade</label>
+            <select
+              value={especialidade}
+              onChange={e => setEspecialidade(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            >
+              <option value="">Selecione uma especialidade</option>
+              {especialidades.map(e => (
+                <option key={e} value={e}>{e}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">WhatsApp do consultório</label>
+            <PhoneInput
+              value={whatsappConsultorio}
+              onChange={setWhatsappConsultorio}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            />
+          </div>
         </div>
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">E-mail de acesso</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="cliente@email.com"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-
-        <p className="text-xs text-gray-400">
-          Uma senha temporária será gerada e enviada por e-mail automaticamente.
-        </p>
-
-        <button
-          onClick={handleCriar}
-          disabled={loading}
-          className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
-        >
-          {loading ? 'Criando...' : 'Criar acesso'}
-        </button>
-
       </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+        <h2 className="text-sm font-medium mb-4">Dados do responsável</h2>
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Nome do responsável</label>
+            <input
+              type="text"
+              value={nomeResponsavel}
+              onChange={e => setNomeResponsavel(e.target.value)}
+              placeholder="Ex: Dra. Ana Silva"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">WhatsApp do responsável</label>
+            <PhoneInput
+              value={whatsappResponsavel}
+              onChange={setWhatsappResponsavel}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">E-mail de acesso</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="cliente@email.com"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p className="text-xs text-gray-400 mb-4">
+        Uma senha temporária será gerada e enviada por e-mail automaticamente.
+      </p>
+
+      <button
+        onClick={handleCriar}
+        disabled={loading}
+        className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+      >
+        {loading ? 'Criando...' : 'Criar acesso'}
+      </button>
     </div>
   )
 }
