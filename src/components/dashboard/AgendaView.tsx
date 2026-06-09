@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import ConsultaActions from '@/components/dashboard/ConsultaActions'
+import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Paciente {
   name: string | null
@@ -17,6 +20,7 @@ interface Consulta {
   scheduled_at: string
   status: string
   notes: string | null
+  archived: boolean
   patients: Paciente | null
   services: Servico | null
 }
@@ -53,6 +57,7 @@ function getInicioDoMes(data: Date) {
 }
 
 export default function AgendaView({ consultas, servicos }: Props) {
+  const router = useRouter()
   const [visualizacao, setVisualizacao] = useState<Visualizacao>('lista')
   const [filtroStatus, setFiltroStatus] = useState<Filtro>('todos')
   const [filtroServico, setFiltroServico] = useState('')
@@ -60,8 +65,13 @@ export default function AgendaView({ consultas, servicos }: Props) {
   const [filtroDataFim, setFiltroDataFim] = useState('')
   const [busca, setBusca] = useState('')
   const [dataAtual, setDataAtual] = useState(new Date())
+  const [mostrarArquivados, setMostrarArquivados] = useState(false)
+  const [selecionados, setSelecionados] = useState<string[]>([])
+  const [loadingAcao, setLoadingAcao] = useState(false)
+  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false)
 
   const consultasFiltradas = consultas.filter(c => {
+    if (c.archived !== mostrarArquivados) return false
     const matchStatus = filtroStatus === 'todos' || c.status === filtroStatus
     const matchBusca = busca === '' ||
       (c.patients?.name ?? '').toLowerCase().includes(busca.toLowerCase())
@@ -71,6 +81,46 @@ export default function AgendaView({ consultas, servicos }: Props) {
     const matchDataFim = filtroDataFim === '' || dataConsulta <= new Date(filtroDataFim + 'T23:59:59')
     return matchStatus && matchBusca && matchServico && matchDataInicio && matchDataFim
   })
+
+  function toggleSelecionado(id: string) {
+    setSelecionados(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    )
+  }
+
+  function toggleTodos() {
+    if (selecionados.length === consultasFiltradas.length) {
+      setSelecionados([])
+    } else {
+      setSelecionados(consultasFiltradas.map(c => c.id))
+    }
+  }
+
+  async function handleArquivar() {
+    if (selecionados.length === 0) return
+    setLoadingAcao(true)
+    const supabase = createClient()
+    await supabase
+      .from('appointments')
+      .update({ archived: !mostrarArquivados })
+      .in('id', selecionados)
+    setSelecionados([])
+    setLoadingAcao(false)
+    router.refresh()
+  }
+
+  async function handleExcluir() {
+    setLoadingAcao(true)
+    const supabase = createClient()
+    await supabase
+      .from('appointments')
+      .delete()
+      .in('id', selecionados)
+    setSelecionados([])
+    setLoadingAcao(false)
+    setMostrarModalExcluir(false)
+    router.refresh()
+  }
 
   function navegar(direcao: number) {
     const nova = new Date(dataAtual)
@@ -97,29 +147,69 @@ export default function AgendaView({ consultas, servicos }: Props) {
       return <p className="px-5 py-8 text-sm text-center text-gray-400">Nenhuma consulta encontrada.</p>
     }
     return (
-      <div className="divide-y divide-gray-100">
-        {consultasFiltradas.map(consulta => (
-          <div key={consulta.id} className="px-5 py-3 flex items-center justify-between">
-            <div>
-              <a href={`/dashboard/agenda/${consulta.id}`} className="text-sm font-medium hover:text-blue-600">
-                 {consulta.patients?.name ?? 'Paciente'}
-            </a>
-              <p className="text-xs text-gray-500">
-                {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
-                  day: '2-digit', month: '2-digit', year: 'numeric',
-                  hour: '2-digit', minute: '2-digit',
-                })}
-                {consulta.services?.name && ` · ${consulta.services.name}`}
-              </p>
-            </div>
+      <div>
+        <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+          <input
+            type="checkbox"
+            checked={selecionados.length === consultasFiltradas.length && consultasFiltradas.length > 0}
+            onChange={toggleTodos}
+            className="rounded"
+          />
+          {selecionados.length > 0 && (
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-0.5 rounded-full ${statusCores[consulta.status] ?? 'bg-gray-100 text-gray-500'}`}>
-                {consulta.status}
-              </span>
-              <ConsultaActions consultaId={consulta.id} statusAtual={consulta.status} />
+              <span className="text-xs text-gray-500">{selecionados.length} selecionado(s)</span>
+              <button
+                onClick={handleArquivar}
+                disabled={loadingAcao}
+                className="text-xs px-3 py-1 rounded border border-gray-200 text-gray-600 hover:bg-white"
+              >
+                {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
+              </button>
+              <button
+                onClick={() => setMostrarModalExcluir(true)}
+                disabled={loadingAcao}
+                className="text-xs px-3 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50"
+              >
+                Excluir
+              </button>
             </div>
-          </div>
-        ))}
+          )}
+        </div>
+
+        <div className="divide-y divide-gray-100">
+          {consultasFiltradas.map(consulta => (
+            <div key={consulta.id} className="px-5 py-3 flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={selecionados.includes(consulta.id)}
+                onChange={() => toggleSelecionado(consulta.id)}
+                className="rounded flex-shrink-0"
+              />
+              <div className="flex-1 flex items-center justify-between">
+                <div>
+                  <a href={`/dashboard/agenda/${consulta.id}`} className="text-sm font-medium hover:text-blue-600">
+                    {consulta.patients?.name ?? 'Paciente'}
+                  </a>
+                  <p className="text-xs text-gray-500">
+                    {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit',
+                    })}
+                    {consulta.services?.name && ` · ${consulta.services.name}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${statusCores[consulta.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                    {consulta.status}
+                  </span>
+                  {!mostrarArquivados && (
+                    <ConsultaActions consultaId={consulta.id} statusAtual={consulta.status} />
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -149,10 +239,10 @@ export default function AgendaView({ consultas, servicos }: Props) {
               </div>
               <div className="p-1 flex flex-col gap-1">
                 {consultasDia.map(c => (
-                  <div key={c.id} className={`text-xs px-1.5 py-1 rounded ${statusCores[c.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                  <a key={c.id} href={`/dashboard/agenda/${c.id}`} className={`text-xs px-1.5 py-1 rounded ${statusCores[c.status] ?? 'bg-gray-100 text-gray-500'} hover:opacity-80`}>
                     <p className="font-medium truncate">{c.patients?.name ?? 'Paciente'}</p>
                     <p>{new Date(c.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
@@ -197,9 +287,9 @@ export default function AgendaView({ consultas, servicos }: Props) {
                 </p>
                 <div className="flex flex-col gap-0.5">
                   {consultasDia.slice(0, 2).map(c => (
-                    <div key={c.id} className={`text-xs px-1 py-0.5 rounded truncate ${statusCores[c.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                    <a key={c.id} href={`/dashboard/agenda/${c.id}`} className={`text-xs px-1 py-0.5 rounded truncate ${statusCores[c.status] ?? 'bg-gray-100 text-gray-500'} hover:opacity-80`}>
                       {c.patients?.name ?? 'Paciente'}
-                    </div>
+                    </a>
                   ))}
                   {consultasDia.length > 2 && (
                     <p className="text-xs text-gray-400">+{consultasDia.length - 2}</p>
@@ -215,18 +305,34 @@ export default function AgendaView({ consultas, servicos }: Props) {
 
   return (
     <div>
+      {mostrarModalExcluir && (
+        <ConfirmModal
+          mensagem={`Excluir ${selecionados.length} consulta(s) permanentemente? Esta ação não pode ser desfeita.`}
+          onConfirmar={handleExcluir}
+          onCancelar={() => setMostrarModalExcluir(false)}
+        />
+      )}
+
       <div className="flex flex-col gap-3 mb-4">
         <div className="flex items-center justify-between">
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-            {(['lista', 'semanal', 'mensal'] as Visualizacao[]).map(v => (
-              <button
-                key={v}
-                onClick={() => setVisualizacao(v)}
-                className={`text-xs px-3 py-1.5 rounded-md capitalize ${visualizacao === v ? 'bg-white text-gray-900 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-              >
-                {v}
-              </button>
-            ))}
+          <div className="flex items-center gap-3">
+            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+              {(['lista', 'semanal', 'mensal'] as Visualizacao[]).map(v => (
+                <button
+                  key={v}
+                  onClick={() => setVisualizacao(v)}
+                  className={`text-xs px-3 py-1.5 rounded-md capitalize ${visualizacao === v ? 'bg-white text-gray-900 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => { setMostrarArquivados(!mostrarArquivados); setSelecionados([]) }}
+              className={`text-xs px-3 py-1.5 rounded-lg border ${mostrarArquivados ? 'border-gray-900 text-gray-900 bg-gray-100' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+            >
+              {mostrarArquivados ? 'Ver ativos' : 'Ver arquivados'}
+            </button>
           </div>
 
           {visualizacao !== 'lista' && (
