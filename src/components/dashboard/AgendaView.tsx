@@ -183,7 +183,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
                 type="checkbox"
                 checked={selecionados.includes(consulta.id)}
                 onChange={() => toggleSelecionado(consulta.id)}
-                className="rounded flex-shrink-0"
+                className="rounded shrink-0"
               />
               <div className="flex-1 flex items-center justify-between">
                 <div>
