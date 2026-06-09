@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function TrocarSenhaPage() {
-  const router = useRouter()
   const supabase = createClient()
 
   const [novaSenha, setNovaSenha] = useState('')
@@ -14,37 +12,38 @@ export default function TrocarSenhaPage() {
   const [loading, setLoading] = useState(false)
 
   async function handleTrocar() {
-  setErro('')
+    setErro('')
 
-  if (novaSenha.length < 6) {
-    setErro('A senha deve ter pelo menos 6 caracteres.')
-    return
+    if (novaSenha.length < 6) {
+      setErro('A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      setErro('As senhas não coincidem.')
+      return
+    }
+
+    setLoading(true)
+
+    const { error } = await supabase.auth.updateUser({ password: novaSenha })
+
+    if (error) {
+      setErro('Erro ao trocar senha.')
+      setLoading(false)
+      return
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    await supabase
+      .from('profiles')
+      .update({ first_login: false })
+      .eq('id', user?.id)
+
+    await new Promise(resolve => setTimeout(resolve, 800))
+    window.location.href = '/dashboard'
   }
-
-  if (novaSenha !== confirmarSenha) {
-    setErro('As senhas não coincidem.')
-    return
-  }
-
-  setLoading(true)
-
-  const { error } = await supabase.auth.updateUser({ password: novaSenha })
-
-  if (error) {
-    setErro('Erro ao trocar senha.')
-    setLoading(false)
-    return
-  }
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  await supabase
-    .from('profiles')
-    .update({ first_login: false })
-    .eq('id', user?.id)
-
-  router.push('/dashboard')
-}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

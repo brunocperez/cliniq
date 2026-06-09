@@ -110,7 +110,7 @@ export default function TenantActions({ tenantId, isActive, userId, tenantName }
       <div className="flex gap-2 mb-4">
         <button
           onClick={() => {
-            navigator.clipboard.writeText(`Senha: ${senhaReset}`)
+            navigator.clipboard.writeText(senhaReset)
             setCopiado(true)
             setTimeout(() => setCopiado(false), 2000)
           }}
