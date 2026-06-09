@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import PacienteNotes from '@/components/dashboard/PacienteNotes'
 
 export default async function PacientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -36,18 +37,15 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
             <p className="text-sm text-gray-500">{paciente.phone}</p>
           </div>
         </div>
-        {paciente.notes && (
-          <div className="border-t border-gray-100 pt-4">
-            <p className="text-xs text-gray-500 mb-1">Observações</p>
-            <p className="text-sm text-gray-700">{paciente.notes}</p>
-          </div>
-        )}
-        <div className="border-t border-gray-100 pt-4 mt-4">
+        <div className="border-t border-gray-100 pt-4">
           <p className="text-xs text-gray-500">
             Cadastrado em {new Date(paciente.created_at).toLocaleDateString('pt-BR')}
           </p>
         </div>
       </div>
+
+      {/* Observações */}
+      <PacienteNotes pacienteId={paciente.id} notasIniciais={paciente.notes} />
 
       {/* Histórico de consultas */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
