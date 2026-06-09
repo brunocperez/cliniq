@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LogoutButton from '@/components/admin/LogoutButton'
 
 export default function AdminLayout({
   children,
@@ -22,6 +23,9 @@ export default function AdminLayout({
             Tenants
           </Link>
         </nav>
+        <div className="p-3 border-t border-gray-200">
+          <LogoutButton />
+        </div>
       </aside>
 
       {/* Conteúdo */}
