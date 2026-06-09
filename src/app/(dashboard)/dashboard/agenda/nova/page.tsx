@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 interface Servico {
   id: string
   name: string
+  duration_minutes: number
 }
 
 interface Paciente {
@@ -17,7 +18,6 @@ interface Paciente {
 
 export default function NovaConsultaPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [servicos, setServicos] = useState<Servico[]>([])
   const [pacientes, setPacientes] = useState<Paciente[]>([])
@@ -30,7 +30,7 @@ export default function NovaConsultaPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    
+
     async function carregar() {
       const { data: profile } = await supabase
         .from('profiles')
@@ -39,7 +39,7 @@ export default function NovaConsultaPage() {
 
       const { data: s } = await supabase
         .from('services')
-        .select('id, name')
+        .select('id, name, duration_minutes')
         .eq('tenant_id', profile?.tenant_id)
 
       const { data: p } = await supabase
@@ -63,12 +63,49 @@ export default function NovaConsultaPage() {
       return
     }
 
+    const supabase = createClient()
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('tenant_id')
       .single()
 
     const scheduledAt = new Date(`${data}T${hora}:00`).toISOString()
+
+    // Busca duração do serviço selecionado
+    const servicoSelecionado = servicos.find(s => s.id === servicoId)
+    const duracao = servicoSelecionado?.duration_minutes ?? 60
+
+    // Calcula fim da nova consulta
+    const novoInicio = new Date(scheduledAt)
+    const novoFim = new Date(novoInicio.getTime() + duracao * 60000)
+
+    // Busca consultas no mesmo dia
+    const inicioDia = new Date(`${data}T00:00:00`).toISOString()
+    const fimDia = new Date(`${data}T23:59:59`).toISOString()
+
+    const { data: consultasExistentes } = await supabase
+      .from('appointments')
+      .select('scheduled_at, services(duration_minutes)')
+      .eq('tenant_id', profile?.tenant_id)
+      .gte('scheduled_at', inicioDia)
+      .lte('scheduled_at', fimDia)
+      .not('status', 'in', '("cancelado","faltou")')
+
+    // Verifica conflito de horário
+    const temConflito = consultasExistentes?.some(c => {
+      const existenteInicio = new Date(c.scheduled_at)
+      const duracaoExistente = (c.services as unknown as { duration_minutes: number } | null)?.duration_minutes ?? 60
+      const existenteFim = new Date(existenteInicio.getTime() + duracaoExistente * 60000)
+
+      return novoInicio < existenteFim && novoFim > existenteInicio
+    })
+
+    if (temConflito) {
+      setErro('Já existe uma consulta neste horário. Escolha outro horário.')
+      setLoading(false)
+      return
+    }
 
     const { error } = await supabase
       .from('appointments')
@@ -130,7 +167,7 @@ export default function NovaConsultaPage() {
             <option value="">Selecione um serviço (opcional)</option>
             {servicos.map(s => (
               <option key={s.id} value={s.id}>
-                {s.name}
+                {s.name} · {s.duration_minutes} min
               </option>
             ))}
           </select>

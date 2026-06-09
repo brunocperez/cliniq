@@ -101,7 +101,9 @@ export default function AgendaView({ consultas, servicos }: Props) {
         {consultasFiltradas.map(consulta => (
           <div key={consulta.id} className="px-5 py-3 flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">{consulta.patients?.name ?? 'Paciente'}</p>
+              <a href={`/dashboard/agenda/${consulta.id}`} className="text-sm font-medium hover:text-blue-600">
+                 {consulta.patients?.name ?? 'Paciente'}
+            </a>
               <p className="text-xs text-gray-500">
                 {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
                   day: '2-digit', month: '2-digit', year: 'numeric',
