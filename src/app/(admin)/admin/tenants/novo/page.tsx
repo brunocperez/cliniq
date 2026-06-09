@@ -12,6 +12,8 @@ export default function NovoTenantPage() {
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
   const [senhaGerada, setSenhaGerada] = useState('')
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [copiado, setCopiado] = useState(false)
 
   async function handleCriar() {
     setErro('')
@@ -35,26 +37,86 @@ export default function NovoTenantPage() {
     setLoading(false)
   }
 
+  function handleCopiar() {
+    navigator.clipboard.writeText(`E-mail: ${email}\nSenha: ${senhaGerada}`)
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
+
+  function handleBaixarPDF() {
+    const conteudo = `
+ClinicSaaS — Dados de Acesso
+=============================
+Consultório: ${nome}
+E-mail: ${email}
+Senha temporária: ${senhaGerada}
+
+Acesse: ${window.location.origin}/login
+
+Atenção: troque sua senha no primeiro acesso.
+    `.trim()
+
+    const blob = new Blob([conteudo], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `acesso-${nome.toLowerCase().replace(/\s+/g, '-')}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (senhaGerada) {
     return (
       <div className="max-w-md">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
-            <span className="text-green-600 text-xl">✓</span>
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
+              <span className="text-green-600 text-xl">✓</span>
+            </div>
+            <h1 className="text-lg font-medium mb-1">Tenant criado com sucesso!</h1>
+            <p className="text-sm text-gray-500">Credenciais de acesso do cliente:</p>
           </div>
-          <h1 className="text-lg font-medium mb-2">Tenant criado com sucesso!</h1>
-          <p className="text-sm text-gray-500 mb-6">
-            Compartilhe os dados de acesso com o cliente:
-          </p>
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-left mb-6">
-            <p className="text-xs text-gray-500 mb-1">E-mail</p>
-            <p className="text-sm font-medium mb-3">{email}</p>
-            <p className="text-xs text-gray-500 mb-1">Senha temporária</p>
-            <p className="text-sm font-medium font-mono">{senhaGerada}</p>
+
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+            <div className="mb-3">
+              <p className="text-xs text-gray-500 mb-1">E-mail</p>
+              <p className="text-sm font-medium">{email}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Senha temporária</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-mono flex-1">
+                  {mostrarSenha ? senhaGerada : '••••••••••'}
+                </p>
+                <button
+                  onClick={() => setMostrarSenha(!mostrarSenha)}
+                  className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 border border-gray-200 rounded"
+                >
+                  {mostrarSenha ? 'Ocultar' : 'Ver'}
+                </button>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-gray-400 mb-6">
-            O cliente será solicitado a trocar a senha no primeiro acesso.
+
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={handleCopiar}
+              className="flex-1 text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
+            >
+              {copiado ? 'Copiado!' : 'Copiar credenciais'}
+            </button>
+            <button
+              onClick={handleBaixarPDF}
+              className="flex-1 text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
+            >
+              Baixar .txt
+            </button>
+          </div>
+
+          <p className="text-xs text-gray-400 text-center mb-4">
+            Um e-mail com as credenciais foi enviado para o cliente.
           </p>
+
           <button
             onClick={() => router.push('/admin')}
             className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium"
@@ -116,7 +178,7 @@ export default function NovoTenantPage() {
         </div>
 
         <p className="text-xs text-gray-400">
-          Uma senha temporária será gerada automaticamente.
+          Uma senha temporária será gerada e enviada por e-mail automaticamente.
         </p>
 
         <button

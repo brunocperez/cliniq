@@ -4,10 +4,13 @@ import TenantActions from '@/components/admin/TenantActions'
 export default async function AdminPage() {
   const supabase = await createServerSupabaseClient()
 
-  const { data: tenants } = await supabase
+  const { data: tenants, error } = await supabase
     .from('tenants')
-    .select('*')
+    .select('*, profiles(id, full_name)')
     .order('created_at', { ascending: false })
+
+  console.log('tenants:', tenants)
+  console.log('error:', error)
 
   return (
     <div>
@@ -34,29 +37,40 @@ export default async function AdminPage() {
           </thead>
           <tbody>
             {tenants && tenants.length > 0 ? (
-              tenants.map((tenant) => (
-                <tr key={tenant.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3 font-medium">{tenant.name}</td>
-                  <td className="px-4 py-3 text-gray-500">{tenant.plan}</td>
-                  <td className="px-4 py-3">
-                    {tenant.is_active ? (
-                      <span className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                        ativo
-                      </span>
-                    ) : (
-                      <span className="bg-red-50 text-red-700 text-xs px-2 py-0.5 rounded-full">
-                        bloqueado
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {new Date(tenant.created_at).toLocaleDateString('pt-BR')}
-                  </td>
-                  <td className="px-4 py-3">
-                    <TenantActions tenantId={tenant.id} isActive={tenant.is_active} />
-                  </td>
-                </tr>
-              ))
+              tenants.map((tenant) => {
+                const profile = Array.isArray(tenant.profiles)
+                  ? tenant.profiles[0]
+                  : tenant.profiles
+
+                return (
+                  <tr key={tenant.id} className="border-b border-gray-100 last:border-0">
+                    <td className="px-4 py-3 font-medium">{tenant.name}</td>
+                    <td className="px-4 py-3 text-gray-500">{tenant.plan}</td>
+                    <td className="px-4 py-3">
+                      {tenant.is_active ? (
+                        <span className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                          ativo
+                        </span>
+                      ) : (
+                        <span className="bg-red-50 text-red-700 text-xs px-2 py-0.5 rounded-full">
+                          bloqueado
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">
+                      {new Date(tenant.created_at).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td className="px-4 py-3">
+                      <TenantActions
+                        tenantId={tenant.id}
+                        isActive={tenant.is_active}
+                        userId={profile?.id}
+                        tenantName={tenant.name}
+                      />
+                    </td>
+                  </tr>
+                )
+              })
             ) : (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
