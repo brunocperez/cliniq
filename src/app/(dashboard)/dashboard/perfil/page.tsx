@@ -3,9 +3,11 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 export default async function PerfilPage() {
   const supabase = await createServerSupabaseClient()
 
+  const { data: { user } } = await supabase.auth.getUser()
+
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, tenants(name, specialty, whatsapp)')
+    .select('*, tenants(name, specialty, whatsapp_consultorio)')
     .single()
 
   const tenant = Array.isArray(profile?.tenants)
@@ -31,13 +33,13 @@ export default async function PerfilPage() {
             <p className="text-sm">{tenant?.specialty ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">WhatsApp</p>
-            <p className="text-sm">{tenant?.whatsapp ?? '—'}</p>
+            <p className="text-xs text-gray-500 mb-1">WhatsApp do consultório</p>
+            <p className="text-sm">{tenant?.whatsapp_consultorio ?? '—'}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
         <h2 className="text-sm font-medium mb-4">Dados do responsável</h2>
         <div className="flex flex-col gap-3">
           <div>
@@ -45,18 +47,15 @@ export default async function PerfilPage() {
             <p className="text-sm">{profile?.responsible_name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Nome de exibição</p>
-            <p className="text-sm">{profile?.full_name ?? '—'}</p>
+            <p className="text-xs text-gray-500 mb-1">WhatsApp do responsável</p>
+            <p className="text-sm">{profile?.whatsapp_responsavel ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">E-mail de acesso</p>
+            <p className="text-sm">{user?.email ?? '—'}</p>
           </div>
         </div>
       </div>
-
-      <a
-        href="/dashboard/perfil/editar"
-        className="block w-full text-center bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:opacity-90"
-      >
-        Editar perfil
-      </a>
     </div>
   )
 }
