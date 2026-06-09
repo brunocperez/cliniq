@@ -34,7 +34,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Verifica se o tenant está ativo
   if (user && path.startsWith('/dashboard')) {
     const adminSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,10 +42,16 @@ export async function proxy(request: NextRequest) {
 
     const { data: profile } = await adminSupabase
       .from('profiles')
-      .select('tenant_id, role')
+      .select('tenant_id, role, first_login')
       .eq('id', user.id)
       .single()
 
+    // Verifica primeiro login
+    if (profile?.first_login && path !== '/dashboard/trocar-senha') {
+      return NextResponse.redirect(new URL('/dashboard/trocar-senha', request.url))
+    }
+
+    // Verifica se tenant está ativo
     if (profile?.role !== 'admin' && profile?.tenant_id) {
       const { data: tenant } = await adminSupabase
         .from('tenants')

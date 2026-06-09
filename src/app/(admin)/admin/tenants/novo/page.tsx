@@ -5,33 +5,66 @@ import { useRouter } from 'next/navigation'
 
 export default function NovoTenantPage() {
   const router = useRouter()
+
   const [nome, setNome] = useState('')
   const [plano, setPlano] = useState('essencial')
   const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
+  const [senhaGerada, setSenhaGerada] = useState('')
 
   async function handleCriar() {
-  setErro('')
-  setLoading(true)
+    setErro('')
+    setLoading(true)
 
-  const res = await fetch('/api/tenants', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome, plano, email, senha }),
-  })
+    const res = await fetch('/api/tenants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, plano, email }),
+    })
 
-  const data = await res.json()
+    const data = await res.json()
 
-  if (!res.ok) {
-    setErro(data.error || 'Erro ao criar tenant.')
+    if (!res.ok) {
+      setErro(data.error || 'Erro ao criar tenant.')
+      setLoading(false)
+      return
+    }
+
+    setSenhaGerada(data.senha)
     setLoading(false)
-    return
   }
 
-  router.push('/admin')
-}
+  if (senhaGerada) {
+    return (
+      <div className="max-w-md">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
+            <span className="text-green-600 text-xl">✓</span>
+          </div>
+          <h1 className="text-lg font-medium mb-2">Tenant criado com sucesso!</h1>
+          <p className="text-sm text-gray-500 mb-6">
+            Compartilhe os dados de acesso com o cliente:
+          </p>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-left mb-6">
+            <p className="text-xs text-gray-500 mb-1">E-mail</p>
+            <p className="text-sm font-medium mb-3">{email}</p>
+            <p className="text-xs text-gray-500 mb-1">Senha temporária</p>
+            <p className="text-sm font-medium font-mono">{senhaGerada}</p>
+          </div>
+          <p className="text-xs text-gray-400 mb-6">
+            O cliente será solicitado a trocar a senha no primeiro acesso.
+          </p>
+          <button
+            onClick={() => router.push('/admin')}
+            className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium"
+          >
+            Voltar para a lista
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-md">
@@ -82,16 +115,9 @@ export default function NovoTenantPage() {
           />
         </div>
 
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Senha inicial</label>
-          <input
-            type="text"
-            value={senha}
-            onChange={e => setSenha(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
+        <p className="text-xs text-gray-400">
+          Uma senha temporária será gerada automaticamente.
+        </p>
 
         <button
           onClick={handleCriar}
