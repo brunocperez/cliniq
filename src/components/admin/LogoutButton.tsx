@@ -3,9 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { LogOut } from 'lucide-react'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 
-export default function LogoutButton() {
+interface Props {
+  expandido: boolean
+}
+
+export default function LogoutButton({ expandido }: Props) {
   const router = useRouter()
   const supabase = createClient()
   const [mostrarModal, setMostrarModal] = useState(false)
@@ -26,9 +31,15 @@ export default function LogoutButton() {
       )}
       <button
         onClick={() => setMostrarModal(true)}
-        className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-400 text-left w-full"
+        title={expandido ? undefined : 'Sair'}
+        className="flex items-center gap-3 px-3 py-2 rounded-lg w-full hover:bg-white/10 transition-colors"
+        style={{
+          color: 'rgba(255,255,255,0.7)',
+          justifyContent: expandido ? 'flex-start' : 'center',
+        }}
       >
-        Sair
+        <LogOut size={18} style={{ flexShrink: 0 }} />
+        {expandido && <span className="text-sm">Sair</span>}
       </button>
     </>
   )
