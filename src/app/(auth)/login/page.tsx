@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -45,18 +46,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm">
 
-        <div className="flex items-center gap-2 mb-6">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: '#0F6E56' }}
-          >
-            <span className="text-white text-sm font-medium">C</span>
-          </div>
-          <span className="text-base font-medium">Cliniq</span>
+        <div className="mb-6">
+          <Image src="/logo.svg" alt="Cliniq" width={120} height={36} />
         </div>
 
-        <h1 className="text-lg font-medium mb-1">Entrar na sua conta</h1>
-        <p className="text-sm text-gray-500 mb-6">Gestão de consultório simplificada</p>
+        <h1 className="text-lg font-medium mb-1">Gestão de consultório simplificada</h1>
+        <p className="text-sm text-gray-500 mb-6">Entrar na sua conta</p>
 
         {erro && (
           <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">

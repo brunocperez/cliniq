@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { LogOut } from 'lucide-react'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 
 interface Props {
@@ -37,7 +38,7 @@ export default function LogoutButton({ expandido }: Props) {
           justifyContent: expandido ? 'flex-start' : 'center',
         }}
       >
-        <i className="ti ti-logout" style={{ fontSize: 18, flexShrink: 0 }} aria-hidden="true"></i>
+        <LogOut size={18} style={{ flexShrink: 0 }} />
         {expandido && <span className="text-sm">Sair</span>}
       </button>
     </>
