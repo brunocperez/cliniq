@@ -48,7 +48,7 @@ export default async function DashboardPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg font-medium">Olá, {profile?.full_name} 👋</h1>
+        <h1 className="text-lg font-medium">Olá, {profile?.full_name}</h1>
         <p className="text-sm text-gray-500">Aqui está o resumo do seu consultório</p>
       </div>
 
