@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import NavLink from '@/components/admin/NavLink'
 import LogoutButton from '@/components/admin/LogoutButton'
 
 export default function AdminLayout({
@@ -14,19 +14,14 @@ export default function AdminLayout({
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#0F6E56' }}>
               <span className="text-white text-xs font-medium">C</span>
             </div>
-            <div>
+            <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Cliniq</span>
-              <span className="ml-2 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">admin</span>
+              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">admin</span>
             </div>
           </div>
         </div>
         <nav className="flex flex-col gap-1 p-3 flex-1">
-          <Link
-            href="/admin"
-            className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700"
-          >
-            Tenants
-          </Link>
+          <NavLink href="/admin" exact>Tenants</NavLink>
         </nav>
         <div className="p-3 border-t border-gray-200">
           <LogoutButton />

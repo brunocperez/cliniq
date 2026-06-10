@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import NavLink from '@/components/dashboard/NavLink'
 import LogoutButton from '@/components/dashboard/LogoutButton'
 
 export default function DashboardLayout({
@@ -18,24 +18,12 @@ export default function DashboardLayout({
           </div>
         </div>
         <nav className="flex flex-col gap-1 p-3 flex-1">
-          <Link href="/dashboard" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-            Visão geral
-          </Link>
-          <Link href="/dashboard/pacientes" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-            Pacientes
-          </Link>
-          <Link href="/dashboard/agenda" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-            Agenda
-          </Link>
-          <Link href="/dashboard/servicos" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-            Serviços
-          </Link>
-          <Link href="/dashboard/metricas" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-            Métricas
-          </Link>
-          <Link href="/dashboard/perfil" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
-            Perfil
-          </Link>
+          <NavLink href="/dashboard" exact>Visão geral</NavLink>
+          <NavLink href="/dashboard/pacientes">Pacientes</NavLink>
+          <NavLink href="/dashboard/agenda">Agenda</NavLink>
+          <NavLink href="/dashboard/servicos">Serviços</NavLink>
+          <NavLink href="/dashboard/metricas">Métricas</NavLink>
+          <NavLink href="/dashboard/perfil">Perfil</NavLink>
         </nav>
         <div className="p-3 border-t border-gray-200">
           <LogoutButton />

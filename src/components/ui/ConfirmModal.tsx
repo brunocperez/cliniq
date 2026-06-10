@@ -27,7 +27,8 @@ export default function ConfirmModal({ mensagem, onConfirmar, onCancelar }: Prop
           </button>
           <button
             onClick={onConfirmar}
-            className="flex-1 text-sm px-4 py-2 rounded-lg bg-gray-900 text-white hover:opacity-90"
+            className="flex-1 text-sm px-4 py-2 rounded-lg text-white"
+            style={{ backgroundColor: '#0F6E56' }}
           >
             Confirmar
           </button>

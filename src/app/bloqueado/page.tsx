@@ -15,8 +15,11 @@ export default function BloqueadoPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm text-center">
-        <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-          <span className="text-red-500 text-xl">✕</span>
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+          style={{ backgroundColor: '#E1F5EE' }}
+        >
+          <span style={{ color: '#0F6E56' }} className="text-xl">✕</span>
         </div>
         <h1 className="text-lg font-medium mb-2">Acesso bloqueado</h1>
         <p className="text-sm text-gray-500 mb-6">
@@ -24,7 +27,8 @@ export default function BloqueadoPage() {
         </p>
         <button
           onClick={handleVoltar}
-          className="text-sm text-gray-400 hover:text-gray-600"
+          className="text-sm"
+          style={{ color: '#0F6E56' }}
         >
           Voltar ao login
         </button>
