@@ -34,7 +34,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  if (user && path.startsWith('/dashboard')) {
+  if (user && (path.startsWith('/dashboard') || path.startsWith('/admin'))) {
     const adminSupabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -46,21 +46,33 @@ export async function proxy(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    // Verifica primeiro login
-    if (profile?.first_login && path !== '/dashboard/trocar-senha') {
-      return NextResponse.redirect(new URL('/dashboard/trocar-senha', request.url))
+    // Bloqueia cliente tentando acessar /admin
+    if (path.startsWith('/admin') && profile?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // Verifica se tenant está ativo
-    if (profile?.role !== 'admin' && profile?.tenant_id) {
-      const { data: tenant } = await adminSupabase
-        .from('tenants')
-        .select('is_active')
-        .eq('id', profile.tenant_id)
-        .single()
+    // Bloqueia admin tentando acessar /dashboard
+    if (path.startsWith('/dashboard') && profile?.role === 'admin') {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
 
-      if (tenant && !tenant.is_active && path !== '/bloqueado') {
-        return NextResponse.redirect(new URL('/bloqueado', request.url))
+    if (path.startsWith('/dashboard')) {
+      // Verifica primeiro login
+      if (profile?.first_login && path !== '/dashboard/trocar-senha') {
+        return NextResponse.redirect(new URL('/dashboard/trocar-senha', request.url))
+      }
+
+      // Verifica se tenant está ativo
+      if (profile?.role !== 'admin' && profile?.tenant_id) {
+        const { data: tenant } = await adminSupabase
+          .from('tenants')
+          .select('is_active')
+          .eq('id', profile.tenant_id)
+          .single()
+
+        if (tenant && !tenant.is_active && path !== '/bloqueado') {
+          return NextResponse.redirect(new URL('/bloqueado', request.url))
+        }
       }
     }
   }
