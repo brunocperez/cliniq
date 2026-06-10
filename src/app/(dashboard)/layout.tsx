@@ -27,6 +27,9 @@ export default function DashboardLayout({
           <Link href="/dashboard/servicos" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
             Serviços
           </Link>
+          <Link href="/dashboard/metricas" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+            Métricas
+          </Link>
           <Link href="/dashboard/perfil" className="text-sm px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
             Perfil
           </Link>

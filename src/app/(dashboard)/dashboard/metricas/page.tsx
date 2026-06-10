@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import MetricasView from '@/components/dashboard/MetricasView'
 
 export default async function MetricasPage() {
   const supabase = await createServerSupabaseClient()
@@ -10,33 +11,29 @@ export default async function MetricasPage() {
 
   const tenantId = profile?.tenant_id
 
-  // Total de pacientes
   const { count: totalPacientes } = await supabase
     .from('patients')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)
+    .eq('archived', false)
 
-  // Total de consultas
   const { count: totalConsultas } = await supabase
     .from('appointments')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)
 
-  // Consultas realizadas
   const { count: totalRealizadas } = await supabase
     .from('appointments')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)
     .eq('status', 'realizado')
 
-  // Consultas que faltou
   const { count: totalFaltou } = await supabase
     .from('appointments')
     .select('*', { count: 'exact', head: true })
     .eq('tenant_id', tenantId)
     .eq('status', 'faltou')
 
-  // Receita total (consultas realizadas com serviço vinculado)
   const { data: consultasRealizadas } = await supabase
     .from('appointments')
     .select('services(price)')
@@ -48,10 +45,16 @@ export default async function MetricasPage() {
     return acc + Number(price)
   }, 0) ?? 0
 
-  // Taxa de no-show
   const taxaNoShow = totalConsultas
     ? Math.round(((totalFaltou ?? 0) / totalConsultas) * 100)
     : 0
+
+  // Dados para gráficos
+  const { data: todasConsultas } = await supabase
+    .from('appointments')
+    .select('scheduled_at, status, services(name, price)')
+    .eq('tenant_id', tenantId)
+    .order('scheduled_at', { ascending: true })
 
   return (
     <div>
@@ -60,35 +63,15 @@ export default async function MetricasPage() {
         <p className="text-sm text-gray-500">Visão geral do seu consultório</p>
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Total de pacientes</p>
-          <p className="text-2xl font-medium">{totalPacientes ?? 0}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Total de consultas</p>
-          <p className="text-2xl font-medium">{totalConsultas ?? 0}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Consultas realizadas</p>
-          <p className="text-2xl font-medium">{totalRealizadas ?? 0}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Taxa de no-show</p>
-          <p className="text-2xl font-medium">{taxaNoShow}%</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Consultas perdidas</p>
-          <p className="text-2xl font-medium">{totalFaltou ?? 0}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Receita total</p>
-          <p className="text-2xl font-medium">
-            R$ {receitaTotal.toFixed(2)}
-          </p>
-        </div>
-      </div>
+      <MetricasView
+        totalPacientes={totalPacientes ?? 0}
+        totalConsultas={totalConsultas ?? 0}
+        totalRealizadas={totalRealizadas ?? 0}
+        totalFaltou={totalFaltou ?? 0}
+        receitaTotal={receitaTotal}
+        taxaNoShow={taxaNoShow}
+        consultas={todasConsultas ?? []}
+      />
     </div>
   )
 }
