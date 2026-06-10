@@ -16,7 +16,8 @@ export default async function AdminPage() {
         <h1 className="text-lg font-medium">Tenants</h1>
         <Link
           href="/admin/tenants/novo"
-          className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:opacity-90"
+          className="text-sm text-white px-4 py-2 rounded-lg hover:opacity-90"
+          style={{ backgroundColor: '#0F6E56' }}
         >
           + Novo acesso
         </Link>
@@ -42,7 +43,7 @@ export default async function AdminPage() {
                 return (
                   <tr key={tenant.id} className="border-b border-gray-100 last:border-0">
                     <td className="px-4 py-3 font-medium">
-                      <Link href={`/admin/tenants/${tenant.id}`} className="hover:text-blue-600">
+                      <Link href={`/admin/tenants/${tenant.id}`} className="hover:text-green-700">
                         {tenant.name}
                       </Link>
                     </td>
