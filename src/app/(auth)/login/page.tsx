@@ -28,14 +28,12 @@ export default function LoginPage() {
       return
     }
 
-    // Busca o role do usuário
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', data.user.id)
       .single()
 
-    // Redireciona pelo role
     if (profile?.role === 'admin') {
       router.push('/admin')
     } else {
@@ -47,12 +45,18 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm">
 
-        <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center mb-5">
-          <span className="text-blue-600 text-xl">+</span>
+        <div className="flex items-center gap-2 mb-6">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: '#0F6E56' }}
+          >
+            <span className="text-white text-sm font-medium">C</span>
+          </div>
+          <span className="text-base font-medium">Cliniq</span>
         </div>
 
         <h1 className="text-lg font-medium mb-1">Entrar na sua conta</h1>
-        <p className="text-sm text-gray-500 mb-6">ClinicSaaS — gestão de consultório</p>
+        <p className="text-sm text-gray-500 mb-6">Gestão de consultório simplificada</p>
 
         {erro && (
           <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">
@@ -86,7 +90,8 @@ export default function LoginPage() {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          style={{ backgroundColor: '#0F6E56' }}
         >
           {loading ? 'Entrando...' : 'Entrar'}
         </button>

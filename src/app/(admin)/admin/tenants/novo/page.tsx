@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import PhoneInput from '@/components/ui/PhoneInput'
 
 const especialidades = [
@@ -78,7 +79,7 @@ export default function NovoTenantPage() {
 
   function handleBaixarTxt() {
     const conteudo = `
-ClinicSaaS — Dados de Acesso
+Cliniq — Dados de Acesso
 =============================
 Consultório: ${nomeConsultorio}
 E-mail: ${email}
@@ -103,10 +104,10 @@ Atenção: troque sua senha no primeiro acesso.
       <div className="max-w-md">
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
-              <span className="text-green-600 text-xl">✓</span>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#E1F5EE' }}>
+              <span className="text-xl" style={{ color: '#0F6E56' }}>✓</span>
             </div>
-            <h1 className="text-lg font-medium mb-1">Tenant criado com sucesso!</h1>
+            <h1 className="text-lg font-medium mb-1">Acesso criado com sucesso!</h1>
             <p className="text-sm text-gray-500">Credenciais de acesso do cliente:</p>
           </div>
 
@@ -152,7 +153,8 @@ Atenção: troque sua senha no primeiro acesso.
 
           <button
             onClick={() => router.push('/admin')}
-            className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium"
+            className="w-full text-white rounded-lg py-2 text-sm font-medium"
+            style={{ backgroundColor: '#0F6E56' }}
           >
             Voltar para a lista
           </button>
@@ -164,7 +166,7 @@ Atenção: troque sua senha no primeiro acesso.
   return (
     <div className="max-w-md">
       <div className="mb-6">
-        <a href="/admin" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
+        <Link href="/admin" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</Link>
         <h1 className="text-lg font-medium mt-2">Novo acesso</h1>
       </div>
 
@@ -252,7 +254,8 @@ Atenção: troque sua senha no primeiro acesso.
       <button
         onClick={handleCriar}
         disabled={loading}
-        className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+        className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+        style={{ backgroundColor: '#0F6E56' }}
       >
         {loading ? 'Criando...' : 'Criar acesso'}
       </button>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 export default function NovoServicoPage() {
   const router = useRouter()
@@ -33,7 +34,6 @@ export default function NovoServicoPage() {
       })
 
     if (error) {
-      console.log(error)
       setErro(error.message)
       setLoading(false)
       return
@@ -45,7 +45,7 @@ export default function NovoServicoPage() {
   return (
     <div className="max-w-md">
       <div className="mb-6">
-        <a href="/dashboard/servicos" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
+        <Link href="/dashboard/servicos" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</Link>
         <h1 className="text-lg font-medium mt-2">Novo serviço</h1>
       </div>
 
@@ -93,7 +93,8 @@ export default function NovoServicoPage() {
         <button
           onClick={handleCriar}
           disabled={loading}
-          className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
+          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
+          style={{ backgroundColor: '#0F6E56' }}
         >
           {loading ? 'Salvando...' : 'Salvar serviço'}
         </button>

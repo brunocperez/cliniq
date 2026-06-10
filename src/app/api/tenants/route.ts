@@ -101,12 +101,12 @@ export async function POST(request: NextRequest) {
 
   // 5. Envia e-mail via Resend
   const { error: emailError } = await resend.emails.send({
-    from: 'ClinicSaaS <onboarding@resend.dev>',
+    from: 'Cliniq <onboarding@resend.dev>',
     to: email,
-    subject: 'Seu acesso ao ClinicSaaS',
+    subject: 'Seu acesso ao Cliniq',
     html: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="font-size: 20px; font-weight: 500;">Bem-vindo ao ClinicSaaS!</h2>
+        <h2 style="font-size: 20px; font-weight: 500;">Bem-vindo ao Cliniq!</h2>
         <p style="color: #555;">Seu consultório <strong>${nome}</strong> foi cadastrado com sucesso.</p>
         <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
           <p style="margin: 0 0 8px;"><strong>E-mail:</strong> ${email}</p>

@@ -196,7 +196,8 @@ export default function NovaConsultaPage() {
         <button
           onClick={handleCriar}
           disabled={loading}
-          className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
+          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
+          style={{ backgroundColor: '#0F6E56' }}
         >
           {loading ? 'Salvando...' : 'Agendar consulta'}
         </button>
