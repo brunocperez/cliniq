@@ -45,7 +45,8 @@ export default function NovoServicoPage() {
   return (
     <div className="max-w-md">
       <div className="mb-6">
-        <Link href="/dashboard/servicos" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</Link>
+        <Link href="/dashboard/servicos" className="text-sm hover:opacity-70"
+style={{ color: '#0F6E56' }}>← Voltar</Link>
         <h1 className="text-lg font-medium mt-2">Novo serviço</h1>
       </div>
 

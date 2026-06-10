@@ -80,7 +80,8 @@ export default function EditarTenantPage() {
   return (
     <div className="max-w-lg">
       <div className="mb-6">
-        <a href={`/admin/tenants/${id}`} className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
+        <a href={`/admin/tenants/${id}`} className="text-sm hover:opacity-70"
+style={{ color: '#0F6E56' }}>← Voltar</a>
         <h1 className="text-lg font-medium mt-2">Editar tenant</h1>
       </div>
 

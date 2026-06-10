@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 interface Servico {
   id: string
@@ -129,7 +130,8 @@ export default function NovaConsultaPage() {
   return (
     <div className="max-w-md">
       <div className="mb-6">
-        <a href="/dashboard/agenda" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
+        <Link href="/dashboard/agenda" className="text-sm hover:opacity-70"
+style={{ color: '#0F6E56' }}>← Voltar</Link>
         <h1 className="text-lg font-medium mt-2">Nova consulta</h1>
       </div>
 

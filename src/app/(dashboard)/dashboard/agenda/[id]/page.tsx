@@ -43,7 +43,8 @@ export default async function ConsultaDetalhesPage({ params }: { params: Promise
   return (
     <div className="max-w-lg">
       <div className="mb-6">
-        <Link href="/dashboard/agenda" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</Link>
+        <Link href="/dashboard/agenda" className="text-sm hover:opacity-70"
+style={{ color: '#0F6E56' }}>← Voltar</Link>
         <div className="flex items-center justify-between mt-2">
           <h1 className="text-lg font-medium">Detalhes da consulta</h1>
           <span className={`text-xs px-2 py-0.5 rounded-full ${statusCores[consulta.status] ?? 'bg-gray-100 text-gray-500'}`}>

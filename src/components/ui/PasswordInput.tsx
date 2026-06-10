@@ -49,7 +49,7 @@ export default function PasswordInput({ value, onChange, label, placeholder }: P
         <button
           type="button"
           onClick={() => setMostrar(!mostrar)}
-          className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 border border-gray-200 rounded-lg flex-shrink-0"
+          className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 border border-gray-200 rounded-lg shrink-0"
         >
           {mostrar ? 'Ocultar' : 'Ver'}
         </button>

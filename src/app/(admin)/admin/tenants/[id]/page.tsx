@@ -30,7 +30,8 @@ export default async function TenantDetalhesPage({ params }: { params: Promise<{
   return (
     <div className="max-w-lg">
       <div className="mb-6">
-        <a href="/admin" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</a>
+        <a href="/admin" className="text-sm hover:opacity-70"
+style={{ color: '#0F6E56' }}>← Voltar</a>
         <div className="flex items-center justify-between mt-2">
           <div>
             <h1 className="text-lg font-medium">{tenant.name}</h1>

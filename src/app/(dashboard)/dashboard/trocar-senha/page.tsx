@@ -84,7 +84,8 @@ export default function TrocarSenhaPage() {
         <button
           onClick={handleTrocar}
           disabled={loading}
-          className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+          style={{ backgroundColor: '#0F6E56' }}
         >
           {loading ? 'Salvando...' : 'Definir nova senha'}
         </button>

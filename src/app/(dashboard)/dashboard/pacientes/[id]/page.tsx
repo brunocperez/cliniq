@@ -25,7 +25,8 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <Link href="/dashboard/pacientes" className="text-sm text-gray-400 hover:text-gray-600">← Voltar</Link>
+        <Link href="/dashboard/pacientes" className="text-sm hover:opacity-70"
+style={{ color: '#0F6E56' }}>← Voltar</Link>
       </div>
 
       {/* Card do paciente */}
