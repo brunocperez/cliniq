@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import Card from '@/components/ui/Card'
 
 export default async function PerfilPage() {
   const supabase = await createServerSupabaseClient()
@@ -21,8 +22,7 @@ export default async function PerfilPage() {
         <p className="text-sm text-gray-500">Suas informações e configurações</p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="text-sm font-medium mb-4">Dados do consultório</h2>
+      <Card title="Dados do consultório" style={{ marginBottom: 16 }}>
         <div className="flex flex-col gap-3">
           <div>
             <p className="text-xs text-gray-500 mb-1">Nome do consultório</p>
@@ -37,10 +37,9 @@ export default async function PerfilPage() {
             <p className="text-sm">{tenant?.whatsapp_consultorio ?? '—'}</p>
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h2 className="text-sm font-medium mb-4">Dados do responsável</h2>
+      <Card title="Dados do responsável">
         <div className="flex flex-col gap-3">
           <div>
             <p className="text-xs text-gray-500 mb-1">Nome do responsável</p>
@@ -55,7 +54,7 @@ export default async function PerfilPage() {
             <p className="text-sm">{user?.email ?? '—'}</p>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ConfirmModal from '@/components/ui/ConfirmModal'
+import Button from '@/components/ui/Button'
 
 interface Servico {
   id: string
@@ -59,8 +60,8 @@ export default function ServicosView({ servicos }: Props) {
         />
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+      <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--surface-app)', borderBottom: '1px solid var(--border-divider)' }}>
           <input
             type="checkbox"
             checked={selecionados.length === servicos.length && servicos.length > 0}
@@ -68,32 +69,28 @@ export default function ServicosView({ servicos }: Props) {
             className="rounded"
           />
           {selecionados.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">{selecionados.length} selecionado(s)</span>
-              <button
-                onClick={() => setMostrarModalExcluir(true)}
-                disabled={loadingAcao}
-                className="text-xs px-3 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50"
-              >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{selecionados.length} selecionado(s)</span>
+              <Button variant="danger" size="sm" onClick={() => setMostrarModalExcluir(true)} disabled={loadingAcao}>
                 Excluir
-              </button>
+              </Button>
             </div>
           )}
         </div>
 
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
+            <tr style={{ background: 'var(--surface-app)', borderBottom: '1px solid var(--border-default)' }}>
               <th className="w-10 px-4 py-3"></th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Nome</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Duração</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Valor</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Nome</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Duração</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Valor</th>
             </tr>
           </thead>
           <tbody>
             {servicos.length > 0 ? (
               servicos.map(servico => (
-                <tr key={servico.id} className="border-b border-gray-100 last:border-0">
+                <tr key={servico.id} style={{ borderBottom: '1px solid var(--border-divider)' }}>
                   <td className="px-4 py-3">
                     <input
                       type="checkbox"
@@ -102,18 +99,16 @@ export default function ServicosView({ servicos }: Props) {
                       className="rounded"
                     />
                   </td>
-                  <td className="px-4 py-3 font-medium">{servico.name}</td>
-                  <td className="px-4 py-3 text-gray-500">{servico.duration_minutes} min</td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {servico.price
-                      ? `R$ ${Number(servico.price).toFixed(2)}`
-                      : '—'}
+                  <td className="px-4 py-3" style={{ fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>{servico.name}</td>
+                  <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{servico.duration_minutes} min</td>
+                  <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>
+                    {servico.price ? `R$ ${Number(servico.price).toFixed(2)}` : '—'}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={4} className="px-4 py-8 text-center" style={{ color: 'var(--text-faint)' }}>
                   Nenhum serviço cadastrado ainda.
                 </td>
               </tr>

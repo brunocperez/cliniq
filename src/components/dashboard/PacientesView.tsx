@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ConfirmModal from '@/components/ui/ConfirmModal'
+import Button from '@/components/ui/Button'
 
 interface Paciente {
   id: string
@@ -90,17 +91,20 @@ export default function PacientesView({ pacientes }: Props) {
           onChange={e => setBusca(e.target.value)}
           placeholder="Buscar por nome ou telefone..."
           className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          style={{ fontFamily: 'var(--font-sans)' }}
         />
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={() => { setMostrarArquivados(!mostrarArquivados); setSelecionados([]) }}
-          className={`text-xs px-3 py-2 rounded-lg border ${mostrarArquivados ? 'border-gray-900 text-gray-900 bg-gray-100' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+          style={mostrarArquivados ? { background: '#F3F4F6', borderColor: '#111827', color: '#111827' } : {}}
         >
           {mostrarArquivados ? 'Ver ativos' : 'Ver arquivados'}
-        </button>
+        </Button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+      <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--surface-app)', borderBottom: '1px solid var(--border-divider)' }}>
           <input
             type="checkbox"
             checked={selecionados.length === pacientesFiltrados.length && pacientesFiltrados.length > 0}
@@ -108,41 +112,33 @@ export default function PacientesView({ pacientes }: Props) {
             className="rounded"
           />
           {selecionados.length > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">{selecionados.length} selecionado(s)</span>
-              <button
-                onClick={handleArquivar}
-                disabled={loadingAcao}
-                className="text-xs px-3 py-1 rounded border border-gray-200 text-gray-600 hover:bg-white"
-              >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{selecionados.length} selecionado(s)</span>
+              <Button variant="secondary" size="sm" onClick={handleArquivar} disabled={loadingAcao}>
                 {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
-              </button>
-              <button
-                onClick={() => setMostrarModalExcluir(true)}
-                disabled={loadingAcao}
-                className="text-xs px-3 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50"
-              >
+              </Button>
+              <Button variant="danger" size="sm" onClick={() => setMostrarModalExcluir(true)} disabled={loadingAcao}>
                 Excluir
-              </button>
+              </Button>
             </div>
           ) : (
-            <span className="text-xs text-gray-400">Nome</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>Nome</span>
           )}
         </div>
 
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
+            <tr style={{ background: 'var(--surface-app)', borderBottom: '1px solid var(--border-default)' }}>
               <th className="w-10 px-4 py-3"></th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Nome</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">WhatsApp</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Cadastrado em</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--text-sm)' }}>Nome</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--text-sm)' }}>WhatsApp</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--text-sm)' }}>Cadastrado em</th>
             </tr>
           </thead>
           <tbody>
             {pacientesFiltrados.length > 0 ? (
               pacientesFiltrados.map(paciente => (
-                <tr key={paciente.id} className="border-b border-gray-100 last:border-0">
+                <tr key={paciente.id} style={{ borderBottom: '1px solid var(--border-divider)' }}>
                   <td className="px-4 py-3">
                     <input
                       type="checkbox"
@@ -151,23 +147,23 @@ export default function PacientesView({ pacientes }: Props) {
                       className="rounded"
                     />
                   </td>
-                  <td className="px-4 py-3 font-medium">
-                    <a href={`/dashboard/pacientes/${paciente.id}`} className="hover:text-blue-600">
+                  <td className="px-4 py-3" style={{ fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
+                    <a href={`/dashboard/pacientes/${paciente.id}`} style={{ color: 'inherit' }}
+                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--brand)')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>
                       {paciente.name ?? '—'}
                     </a>
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{paciente.phone}</td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{paciente.phone}</td>
+                  <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>
                     {new Date(paciente.created_at).toLocaleDateString('pt-BR')}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
-                  {mostrarArquivados
-                    ? 'Nenhum paciente arquivado.'
-                    : 'Nenhum paciente cadastrado ainda.'}
+                <td colSpan={4} className="px-4 py-8 text-center" style={{ color: 'var(--text-faint)' }}>
+                  {mostrarArquivados ? 'Nenhum paciente arquivado.' : 'Nenhum paciente cadastrado ainda.'}
                 </td>
               </tr>
             )}
