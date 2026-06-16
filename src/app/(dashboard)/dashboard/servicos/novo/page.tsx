@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Button from '@/components/ui/Button'
+import Card from '@/components/ui/Card'
 
 export default function NovoServicoPage() {
   const router = useRouter()
@@ -42,65 +44,83 @@ export default function NovoServicoPage() {
     router.push('/dashboard/servicos')
   }
 
+  const inputStyle = {
+    width: '100%',
+    border: '1px solid var(--border-default)',
+    borderRadius: 'var(--radius-md)',
+    padding: '8px 12px',
+    fontSize: 'var(--text-sm)',
+    fontFamily: 'var(--font-sans)',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+    color: 'var(--text-body)',
+    background: 'var(--surface-card)',
+  }
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: 'var(--text-xs)',
+    color: 'var(--text-muted)',
+    marginBottom: 4,
+  }
+
   return (
     <div className="max-w-md">
       <div className="mb-6">
-        <Link href="/dashboard/servicos" className="text-sm hover:opacity-70"
-style={{ color: '#0F6E56' }}>← Voltar</Link>
-        <h1 className="text-lg font-medium mt-2">Novo serviço</h1>
+        <Link href="/dashboard/servicos" className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>← Voltar</Link>
+        <h1 className="text-lg font-medium mt-2" style={{ color: 'var(--text-strong)' }}>Novo serviço</h1>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col gap-4">
+      <Card>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {erro && (
+            <div style={{ background: 'var(--danger-50)', border: '1px solid var(--danger-200)', color: 'var(--danger-600)', borderRadius: 'var(--radius-md)', padding: '8px 12px', fontSize: 'var(--text-sm)' }}>
+              {erro}
+            </div>
+          )}
 
-        {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm">
-            {erro}
+          <div>
+            <label style={labelStyle}>Nome do serviço</label>
+            <input
+              type="text"
+              value={nome}
+              onChange={e => setNome(e.target.value)}
+              placeholder="Ex: Consulta inicial"
+              style={inputStyle}
+            />
           </div>
-        )}
 
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Nome do serviço</label>
-          <input
-            type="text"
-            value={nome}
-            onChange={e => setNome(e.target.value)}
-            placeholder="Ex: Consulta inicial"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
+          <div>
+            <label style={labelStyle}>Duração (minutos)</label>
+            <input
+              type="number"
+              value={duracao}
+              onChange={e => setDuracao(e.target.value)}
+              placeholder="60"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Valor (R$)</label>
+            <input
+              type="number"
+              value={preco}
+              onChange={e => setPreco(e.target.value)}
+              placeholder="150.00"
+              style={inputStyle}
+            />
+          </div>
+
+          <Button
+            onClick={handleCriar}
+            disabled={loading}
+            style={{ width: '100%', marginTop: 4 }}
+          >
+            {loading ? 'Salvando...' : 'Salvar serviço'}
+          </Button>
         </div>
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Duração (minutos)</label>
-          <input
-            type="number"
-            value={duracao}
-            onChange={e => setDuracao(e.target.value)}
-            placeholder="60"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Valor (R$)</label>
-          <input
-            type="number"
-            value={preco}
-            onChange={e => setPreco(e.target.value)}
-            placeholder="150.00"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-
-        <button
-          onClick={handleCriar}
-          disabled={loading}
-          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
-          style={{ backgroundColor: '#0F6E56' }}
-        >
-          {loading ? 'Salvando...' : 'Salvar serviço'}
-        </button>
-
-      </div>
+      </Card>
     </div>
   )
 }
