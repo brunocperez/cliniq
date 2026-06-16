@@ -6,3 +6,79 @@
   --color-cliniq-400: #5DCAA5;
   --color-cliniq-50: #E1F5EE;
 }
+
+:root {
+  /* Brand */
+  --brand: #0F6E56;
+  --brand-hover: #0a5a45;
+  --cliniq-600: #0F6E56;
+  --cliniq-500: #1D9E75;
+  --cliniq-50: #E1F5EE;
+
+  /* Surfaces */
+  --surface-app: #F9FAFB;
+  --surface-card: #FFFFFF;
+
+  /* Text */
+  --text-strong: #111827;
+  --text-body: #374151;
+  --text-muted: #6B7280;
+  --text-faint: #9CA3AF;
+  --text-on-brand: #FFFFFF;
+
+  /* Borders */
+  --border-default: #E5E7EB;
+  --border-divider: #F3F4F6;
+  --border-focus: #9CA3AF;
+
+  /* Status — agendado */
+  --agendado-fill: #FFFBEB;
+  --agendado-ink: #92400E;
+
+  /* Status — confirmado */
+  --confirmado-fill: #EFF6FF;
+  --confirmado-ink: #1E40AF;
+
+  /* Status — realizado */
+  --realizado-fill: #ECFDF5;
+  --realizado-ink: #065F46;
+
+  /* Status — faltou */
+  --faltou-fill: #FEF2F2;
+  --faltou-ink: #991B1B;
+
+  /* Status — cancelado */
+  --cancelado-fill: #F3F4F6;
+  --cancelado-ink: #4B5563;
+
+  /* Danger */
+  --danger-50: #FEF2F2;
+  --danger-200: #FECACA;
+  --danger-600: #DC2626;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* Sidebar */
+  --sidebar-w: 224px;
+  --sidebar-w-collapsed: 64px;
+
+  /* Typography */
+  --font-sans: var(--font-geist, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, monospace);
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-2xl: 24px;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --line-tight: 1.25;
+
+  /* Misc */
+  --white: #FFFFFF;
+}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ConsultaActions from '@/components/dashboard/ConsultaActions'
 import ConfirmModal from '@/components/ui/ConfirmModal'
+import StatusBadge from '@/components/ui/StatusBadge'
 
 interface Paciente {
   name: string | null
@@ -32,14 +33,6 @@ interface Props {
 
 type Visualizacao = 'lista' | 'semanal' | 'mensal'
 type Filtro = 'todos' | 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
-
-const statusCores: Record<string, string> = {
-  agendado: 'bg-yellow-50 text-yellow-700',
-  confirmado: 'bg-green-50 text-green-700',
-  realizado: 'bg-blue-50 text-blue-700',
-  faltou: 'bg-red-50 text-red-700',
-  cancelado: 'bg-gray-100 text-gray-500',
-}
 
 function getNomeSemana(data: Date) {
   return data.toLocaleDateString('pt-BR', { weekday: 'short' })
@@ -199,9 +192,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${statusCores[consulta.status] ?? 'bg-gray-100 text-gray-500'}`}>
-                    {consulta.status}
-                  </span>
+                  <StatusBadge status={consulta.status as 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'} />
                   {!mostrarArquivados && (
                     <ConsultaActions consultaId={consulta.id} statusAtual={consulta.status} />
                   )}
@@ -239,7 +230,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
               </div>
               <div className="p-1 flex flex-col gap-1">
                 {consultasDia.map(c => (
-                  <a key={c.id} href={`/dashboard/agenda/${c.id}`} className={`text-xs px-1.5 py-1 rounded ${statusCores[c.status] ?? 'bg-gray-100 text-gray-500'} hover:opacity-80`}>
+                  <a key={c.id} href={`/dashboard/agenda/${c.id}`} className="text-xs px-1.5 py-1 rounded hover:opacity-80" style={{ background: 'var(--' + c.status + '-fill)', color: 'var(--' + c.status + '-ink)' }}>
                     <p className="font-medium truncate">{c.patients?.name ?? 'Paciente'}</p>
                     <p>{new Date(c.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
                   </a>
@@ -287,7 +278,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
                 </p>
                 <div className="flex flex-col gap-0.5">
                   {consultasDia.slice(0, 2).map(c => (
-                    <a key={c.id} href={`/dashboard/agenda/${c.id}`} className={`text-xs px-1 py-0.5 rounded truncate ${statusCores[c.status] ?? 'bg-gray-100 text-gray-500'} hover:opacity-80`}>
+                    <a key={c.id} href={`/dashboard/agenda/${c.id}`} className="text-xs px-1 py-0.5 rounded truncate hover:opacity-80" style={{ background: 'var(--' + c.status + '-fill)', color: 'var(--' + c.status + '-ink)' }}>
                       {c.patients?.name ?? 'Paciente'}
                     </a>
                   ))}

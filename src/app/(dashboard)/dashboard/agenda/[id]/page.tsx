@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import ConsultaActions from '@/components/dashboard/ConsultaActions'
 import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
 import RetornoButton from '@/components/dashboard/RetornoButton'
+import StatusBadge from '@/components/ui/StatusBadge'
 
 export default async function ConsultaDetalhesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -22,7 +23,6 @@ export default async function ConsultaDetalhesPage({ params }: { params: Promise
     .select('tenant_id')
     .single()
 
-  // Busca retorno agendado para esta consulta
   const { data: retorno } = await supabase
     .from('appointments')
     .select('*, patients(name), services(name)')
@@ -32,35 +32,25 @@ export default async function ConsultaDetalhesPage({ params }: { params: Promise
   const paciente = consulta.patients as { id: string; name: string; phone: string } | null
   const servico = consulta.services as { name: string; duration_minutes: number } | null
 
-  const statusCores: Record<string, string> = {
-    agendado: 'bg-yellow-50 text-yellow-700',
-    confirmado: 'bg-green-50 text-green-700',
-    realizado: 'bg-blue-50 text-blue-700',
-    faltou: 'bg-red-50 text-red-700',
-    cancelado: 'bg-gray-100 text-gray-500',
-  }
+  type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
 
   return (
     <div className="max-w-lg">
       <div className="mb-6">
-        <Link href="/dashboard/agenda" className="text-sm hover:opacity-70"
-style={{ color: '#0F6E56' }}>← Voltar</Link>
+        <Link href="/dashboard/agenda" className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>← Voltar</Link>
         <div className="flex items-center justify-between mt-2">
           <h1 className="text-lg font-medium">Detalhes da consulta</h1>
-          <span className={`text-xs px-2 py-0.5 rounded-full ${statusCores[consulta.status] ?? 'bg-gray-100 text-gray-500'}`}>
-            {consulta.status}
-          </span>
+          <StatusBadge status={consulta.status as Status} />
         </div>
       </div>
 
-      {/* Informações */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
         <h2 className="text-sm font-medium mb-4">Informações</h2>
         <div className="flex flex-col gap-3">
           <div>
             <p className="text-xs text-gray-500 mb-1">Paciente</p>
             {paciente ? (
-              <Link href={`/dashboard/pacientes/${paciente.id}`} className="text-sm hover:text-blue-600">
+              <Link href={`/dashboard/pacientes/${paciente.id}`} className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>
                 {paciente.name ?? paciente.phone}
               </Link>
             ) : (
@@ -89,12 +79,10 @@ style={{ color: '#0F6E56' }}>← Voltar</Link>
         </div>
       </div>
 
-      {/* Notas */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
         <ConsultaNotes consultaId={consulta.id} notasIniciais={consulta.notes} />
       </div>
 
-      {/* Retorno */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-medium">Retorno</h2>
@@ -115,9 +103,7 @@ style={{ color: '#0F6E56' }}>← Voltar</Link>
                 })}
               </p>
             </div>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${statusCores[retorno.status] ?? 'bg-gray-100 text-gray-500'}`}>
-              {retorno.status}
-            </span>
+            <StatusBadge status={retorno.status as Status} />
           </Link>
         ) : (
           <RetornoButton
@@ -128,7 +114,6 @@ style={{ color: '#0F6E56' }}>← Voltar</Link>
         )}
       </div>
 
-      {/* Ações */}
       {consulta.status !== 'realizado' && consulta.status !== 'cancelado' && (
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <h2 className="text-sm font-medium mb-4">Atualizar status</h2>

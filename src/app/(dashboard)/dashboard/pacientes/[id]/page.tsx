@@ -3,6 +3,9 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import PacienteNotes from '@/components/dashboard/PacienteNotes'
 import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
+import StatusBadge from '@/components/ui/StatusBadge'
+
+type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
 
 export default async function PacientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -25,11 +28,9 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <Link href="/dashboard/pacientes" className="text-sm hover:opacity-70"
-style={{ color: '#0F6E56' }}>← Voltar</Link>
+        <Link href="/dashboard/pacientes" className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>← Voltar</Link>
       </div>
 
-      {/* Card do paciente */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium text-gray-500">
@@ -47,10 +48,8 @@ style={{ color: '#0F6E56' }}>← Voltar</Link>
         </div>
       </div>
 
-      {/* Observações */}
       <PacienteNotes pacienteId={paciente.id} notasIniciais={paciente.notes} />
 
-      {/* Histórico de consultas */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-sm font-medium">Histórico de consultas</h2>
@@ -66,23 +65,12 @@ style={{ color: '#0F6E56' }}>← Voltar</Link>
                     </p>
                     <p className="text-xs text-gray-500">
                       {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit',
                       })}
                     </p>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    consulta.status === 'confirmado' ? 'bg-green-50 text-green-700' :
-                    consulta.status === 'realizado' ? 'bg-blue-50 text-blue-700' :
-                    consulta.status === 'faltou' ? 'bg-red-50 text-red-700' :
-                    consulta.status === 'cancelado' ? 'bg-gray-100 text-gray-500' :
-                    'bg-yellow-50 text-yellow-700'
-                  }`}>
-                    {consulta.status}
-                  </span>
+                  <StatusBadge status={consulta.status as Status} />
                 </div>
                 <ConsultaNotes consultaId={consulta.id} notasIniciais={consulta.notes} />
               </div>
