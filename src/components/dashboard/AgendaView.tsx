@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import ConsultaActions from '@/components/dashboard/ConsultaActions'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import StatusBadge from '@/components/ui/StatusBadge'
+import Button from '@/components/ui/Button'
 
 interface Paciente {
   name: string | null
@@ -151,20 +152,12 @@ export default function AgendaView({ consultas, servicos }: Props) {
           {selecionados.length > 0 && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">{selecionados.length} selecionado(s)</span>
-              <button
-                onClick={handleArquivar}
-                disabled={loadingAcao}
-                className="text-xs px-3 py-1 rounded border border-gray-200 text-gray-600 hover:bg-white"
-              >
-                {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
-              </button>
-              <button
-                onClick={() => setMostrarModalExcluir(true)}
-                disabled={loadingAcao}
-                className="text-xs px-3 py-1 rounded border border-red-200 text-red-600 hover:bg-red-50"
-              >
-                Excluir
-              </button>
+              <Button variant="secondary" size="sm" onClick={handleArquivar} disabled={loadingAcao}>
+              {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
+            </Button>
+            <Button variant="danger" size="sm" onClick={() => setMostrarModalExcluir(true)} disabled={loadingAcao}>
+              Excluir
+            </Button>
             </div>
           )}
         </div>
@@ -318,12 +311,14 @@ export default function AgendaView({ consultas, servicos }: Props) {
                 </button>
               ))}
             </div>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => { setMostrarArquivados(!mostrarArquivados); setSelecionados([]) }}
-              className={`text-xs px-3 py-1.5 rounded-lg border ${mostrarArquivados ? 'border-gray-900 text-gray-900 bg-gray-100' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+              style={mostrarArquivados ? { background: '#F3F4F6', borderColor: '#111827', color: '#111827' } : {}}
             >
               {mostrarArquivados ? 'Ver ativos' : 'Ver arquivados'}
-            </button>
+            </Button>
           </div>
 
           {visualizacao !== 'lista' && (
