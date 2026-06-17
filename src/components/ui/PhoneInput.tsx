@@ -5,6 +5,7 @@ interface Props {
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  style?: React.CSSProperties
 }
 
 function formatarTelefone(valor: string) {
@@ -16,7 +17,7 @@ function formatarTelefone(valor: string) {
   return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`
 }
 
-export default function PhoneInput({ value, onChange, placeholder, className }: Props) {
+export default function PhoneInput({ value, onChange, placeholder, className, style }: Props) {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     onChange(formatarTelefone(e.target.value))
   }
@@ -28,6 +29,7 @@ export default function PhoneInput({ value, onChange, placeholder, className }: 
       onChange={handleChange}
       placeholder={placeholder ?? '(11) 99999-9999'}
       className={className}
+      style={style}
     />
   )
 }

@@ -40,9 +40,7 @@ export default async function AdminPage() {
                 return (
                   <tr key={tenant.id} style={{ borderBottom: '1px solid var(--border-divider)' }}>
                     <td className="px-4 py-3" style={{ fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
-                      <Link href={`/admin/tenants/${tenant.id}`} style={{ color: 'inherit' }}
-                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--brand)')}
-                        onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>
+                      <Link href={`/admin/tenants/${tenant.id}`} className="hover:text-green-700" style={{ color: 'var(--text-strong)' }}>
                         {tenant.name}
                       </Link>
                     </td>
