@@ -86,6 +86,15 @@ export default function NovaConsultaPage() {
       return
     }
 
+    // Bloqueia datas e horários no passado
+    const agora = new Date()
+    const dataHoraSelecionada = new Date(`${data}T${hora}:00`)
+    if (dataHoraSelecionada <= agora) {
+      setErro('Não é possível agendar consultas em datas ou horários passados.')
+      setLoading(false)
+      return
+    }
+
     const supabase = createClient()
 
     const { data: profile } = await supabase
