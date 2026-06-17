@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import TenantActions from '@/components/admin/TenantActions'
+import Button from '@/components/ui/Button'
 
 export default async function AdminPage() {
   const supabase = await createServerSupabaseClient()
@@ -12,25 +13,21 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-lg font-medium">Tenants</h1>
-        <Link
-          href="/admin/tenants/novo"
-          className="text-sm text-white px-4 py-2 rounded-lg hover:opacity-90"
-          style={{ backgroundColor: '#0F6E56' }}
-        >
-          + Novo acesso
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Tenants</h1>
+        <Link href="/admin/tenants/novo">
+          <Button>+ Novo acesso</Button>
         </Link>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Nome</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Criado em</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Ações</th>
+            <tr style={{ background: 'var(--surface-app)', borderBottom: '1px solid var(--border-default)' }}>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Nome</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Status</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Criado em</th>
+              <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -41,24 +38,26 @@ export default async function AdminPage() {
                   : tenant.profiles
 
                 return (
-                  <tr key={tenant.id} className="border-b border-gray-100 last:border-0">
-                    <td className="px-4 py-3 font-medium">
-                      <Link href={`/admin/tenants/${tenant.id}`} className="hover:text-green-700">
+                  <tr key={tenant.id} style={{ borderBottom: '1px solid var(--border-divider)' }}>
+                    <td className="px-4 py-3" style={{ fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
+                      <Link href={`/admin/tenants/${tenant.id}`} style={{ color: 'inherit' }}
+                        onMouseEnter={e => (e.currentTarget.style.color = 'var(--brand)')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}>
                         {tenant.name}
                       </Link>
                     </td>
                     <td className="px-4 py-3">
                       {tenant.is_active ? (
-                        <span className="bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                        <span style={{ background: 'var(--realizado-fill)', color: 'var(--realizado-ink)', fontSize: 'var(--text-xs)', padding: '2px 8px', borderRadius: 'var(--radius-pill)', fontWeight: 'var(--weight-medium)' }}>
                           ativo
                         </span>
                       ) : (
-                        <span className="bg-red-50 text-red-700 text-xs px-2 py-0.5 rounded-full">
+                        <span style={{ background: 'var(--faltou-fill)', color: 'var(--faltou-ink)', fontSize: 'var(--text-xs)', padding: '2px 8px', borderRadius: 'var(--radius-pill)', fontWeight: 'var(--weight-medium)' }}>
                           bloqueado
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-500">
+                    <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>
                       {new Date(tenant.created_at).toLocaleDateString('pt-BR')}
                     </td>
                     <td className="px-4 py-3">
@@ -74,7 +73,7 @@ export default async function AdminPage() {
               })
             ) : (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={4} className="px-4 py-8 text-center" style={{ color: 'var(--text-faint)' }}>
                   Nenhum tenant cadastrado ainda.
                 </td>
               </tr>
