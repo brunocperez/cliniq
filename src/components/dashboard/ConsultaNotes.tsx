@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Button from '@/components/ui/Button'
 
 interface Props {
   consultaId: string
@@ -32,12 +33,14 @@ export default function ConsultaNotes({ consultaId, notasIniciais }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-xs text-gray-500">Notas</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Notas</p>
         {!editando && (
           <button
             onClick={() => setEditando(true)}
-            className="text-xs text-gray-400 hover:text-gray-600"
+            style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-body)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}
           >
             {notas ? 'Editar' : '+ Adicionar'}
           </button>
@@ -51,26 +54,35 @@ export default function ConsultaNotes({ consultaId, notasIniciais }: Props) {
             onChange={e => setNotas(e.target.value)}
             rows={3}
             placeholder="Anotações da consulta..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 resize-none"
+            style={{
+              width: '100%',
+              border: '1px solid var(--border-default)',
+              borderRadius: 'var(--radius-md)',
+              padding: '8px 12px',
+              fontSize: 'var(--text-sm)',
+              fontFamily: 'var(--font-sans)',
+              outline: 'none',
+              resize: 'none',
+              boxSizing: 'border-box',
+              color: 'var(--text-body)',
+              background: 'var(--surface-card)',
+            }}
           />
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleSalvar}
-              disabled={loading}
-              className="text-sm px-4 py-1.5 bg-gray-900 text-white rounded-lg disabled:opacity-50"
-            >
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <Button onClick={handleSalvar} disabled={loading} size="sm">
               {loading ? 'Salvando...' : 'Salvar'}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => { setEditando(false); setNotas(notasIniciais ?? '') }}
-              className="text-sm px-4 py-1.5 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <p className="text-sm text-gray-500">
+        <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
           {notas || 'Nenhuma nota registrada.'}
         </p>
       )}

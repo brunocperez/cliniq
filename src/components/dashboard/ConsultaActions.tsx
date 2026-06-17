@@ -8,6 +8,13 @@ interface Props {
   statusAtual: string
 }
 
+const acoes = [
+  { status: 'confirmado', label: 'Confirmar', fill: 'var(--confirmado-fill)', ink: 'var(--confirmado-ink)', somente: ['agendado'] },
+  { status: 'realizado', label: 'Realizado', fill: 'var(--realizado-fill)', ink: 'var(--realizado-ink)', somente: null },
+  { status: 'faltou', label: 'Faltou', fill: 'var(--faltou-fill)', ink: 'var(--faltou-ink)', somente: null },
+  { status: 'cancelado', label: 'Cancelar', fill: 'var(--cancelado-fill)', ink: 'var(--cancelado-ink)', somente: null },
+]
+
 export default function ConsultaActions({ consultaId, statusAtual }: Props) {
   const router = useRouter()
   const supabase = createClient()
@@ -22,37 +29,34 @@ export default function ConsultaActions({ consultaId, statusAtual }: Props) {
   }
 
   if (statusAtual === 'realizado' || statusAtual === 'cancelado') {
-    return <span className="text-xs text-gray-300">—</span>
+    return <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>—</span>
   }
 
   return (
-    <div className="flex gap-2">
-      {statusAtual === 'agendado' && (
-        <button
-          onClick={() => handleStatus('confirmado')}
-          className="text-xs px-3 py-1 rounded-full border border-green-200 text-green-600 hover:bg-green-50"
-        >
-          Confirmar
-        </button>
-      )}
-      <button
-        onClick={() => handleStatus('realizado')}
-        className="text-xs px-3 py-1 rounded-full border border-blue-200 text-blue-600 hover:bg-blue-50"
-      >
-        Realizado
-      </button>
-      <button
-        onClick={() => handleStatus('faltou')}
-        className="text-xs px-3 py-1 rounded-full border border-red-200 text-red-600 hover:bg-red-50"
-      >
-        Faltou
-      </button>
-      <button
-        onClick={() => handleStatus('cancelado')}
-        className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50"
-      >
-        Cancelar
-      </button>
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      {acoes.map(acao => {
+        if (acao.somente && !acao.somente.includes(statusAtual)) return null
+        return (
+          <button
+            key={acao.status}
+            onClick={() => handleStatus(acao.status)}
+            style={{
+              fontSize: 'var(--text-xs)',
+              padding: '4px 12px',
+              borderRadius: 'var(--radius-pill)',
+              border: `1px solid ${acao.ink}33`,
+              background: acao.fill,
+              color: acao.ink,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-sans)',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          >
+            {acao.label}
+          </button>
+        )
+      })}
     </div>
   )
 }

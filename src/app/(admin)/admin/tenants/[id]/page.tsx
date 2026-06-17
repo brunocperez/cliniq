@@ -1,5 +1,8 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import Link from 'next/link'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
 
 export default async function TenantDetalhesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -29,68 +32,67 @@ export default async function TenantDetalhesPage({ params }: { params: Promise<{
 
   return (
     <div className="max-w-lg">
-      <div className="mb-6">
-        <a href="/admin" className="text-sm hover:opacity-70"
-style={{ color: '#0F6E56' }}>← Voltar</a>
-        <div className="flex items-center justify-between mt-2">
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/admin" className="text-sm hover:opacity-70" style={{ color: 'var(--brand)' }}>← Voltar</Link>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
           <div>
-            <h1 className="text-lg font-medium">{tenant.name}</h1>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${
-              tenant.is_active
-                ? 'bg-green-50 text-green-700'
-                : 'bg-red-50 text-red-700'
-            }`}>
+            <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>{tenant.name}</h1>
+            <span style={{
+              display: 'inline-block',
+              marginTop: 4,
+              fontSize: 'var(--text-xs)',
+              fontWeight: 'var(--weight-medium)',
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-pill)',
+              background: tenant.is_active ? 'var(--realizado-fill)' : 'var(--faltou-fill)',
+              color: tenant.is_active ? 'var(--realizado-ink)' : 'var(--faltou-ink)',
+            }}>
               {tenant.is_active ? 'ativo' : 'bloqueado'}
             </span>
           </div>
-          <a
-            href={`/admin/tenants/${id}/editar`}
-            className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:opacity-90"
-          >
-            Editar
-          </a>
+          <Link href={`/admin/tenants/${id}/editar`}>
+            <Button variant="secondary">Editar</Button>
+          </Link>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="text-sm font-medium mb-4">Dados do consultório</h2>
-        <div className="flex flex-col gap-3">
+      <Card title="Dados do consultório" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Nome</p>
-            <p className="text-sm">{tenant.name ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Nome</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{tenant.name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Especialidade</p>
-            <p className="text-sm">{tenant.specialty ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Especialidade</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{tenant.specialty ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">WhatsApp do consultório</p>
-            <p className="text-sm">{tenant.whatsapp_consultorio ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>WhatsApp do consultório</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{tenant.whatsapp_consultorio ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Cadastrado em</p>
-            <p className="text-sm">{new Date(tenant.created_at).toLocaleDateString('pt-BR')}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Cadastrado em</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{new Date(tenant.created_at).toLocaleDateString('pt-BR')}</p>
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="text-sm font-medium mb-4">Dados do responsável</h2>
-        <div className="flex flex-col gap-3">
+      <Card title="Dados do responsável">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Nome do responsável</p>
-            <p className="text-sm">{profile?.responsible_name ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Nome do responsável</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{profile?.responsible_name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">WhatsApp do responsável</p>
-            <p className="text-sm">{profile?.whatsapp_responsavel ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>WhatsApp do responsável</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{profile?.whatsapp_responsavel ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">E-mail de acesso</p>
-            <p className="text-sm">{email}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>E-mail de acesso</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{email}</p>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }
