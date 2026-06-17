@@ -52,7 +52,7 @@ function getInicioDoMes(data: Date) {
 
 export default function AgendaView({ consultas, servicos }: Props) {
   const router = useRouter()
-  const [visualizacao, setVisualizacao] = useState<Visualizacao>('lista')
+  const [visualizacao, setVisualizacao] = useState<Visualizacao>('semanal')
   const [filtroStatus, setFiltroStatus] = useState<Filtro>('todos')
   const [filtroServico, setFiltroServico] = useState('')
   const [filtroDataInicio, setFiltroDataInicio] = useState('')
@@ -153,11 +153,11 @@ export default function AgendaView({ consultas, servicos }: Props) {
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">{selecionados.length} selecionado(s)</span>
               <Button variant="secondary" size="sm" onClick={handleArquivar} disabled={loadingAcao}>
-              {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
-            </Button>
-            <Button variant="danger" size="sm" onClick={() => setMostrarModalExcluir(true)} disabled={loadingAcao}>
-              Excluir
-            </Button>
+                {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
+              </Button>
+              <Button variant="danger" size="sm" onClick={() => setMostrarModalExcluir(true)} disabled={loadingAcao}>
+                Excluir
+              </Button>
             </div>
           )}
         </div>
@@ -207,7 +207,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
     })
 
     return (
-      <div className="grid grid-cols-7 divide-x divide-gray-100">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid var(--border-divider)' }}>
         {dias.map((dia, i) => {
           const consultasDia = consultasFiltradas.filter(c => {
             const d = new Date(c.scheduled_at)
@@ -216,16 +216,19 @@ export default function AgendaView({ consultas, servicos }: Props) {
           const hoje = dia.toDateString() === new Date().toDateString()
 
           return (
-            <div key={i} className="min-h-32">
+            <div key={i} style={{ minHeight: 128, borderRight: i < 6 ? '1px solid var(--border-divider)' : 'none' }}>
               <div style={{ padding: '8px', textAlign: 'center', borderBottom: '1px solid var(--border-divider)', background: hoje ? 'var(--cliniq-50)' : 'transparent' }}>
-                <p className="text-xs text-gray-500 capitalize">{getNomeSemana(dia)}</p>
+                <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{getNomeSemana(dia)}</p>
                 <p style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: hoje ? 'var(--brand)' : 'var(--text-body)' }}>{dia.getDate()}</p>
               </div>
-              <div className="p-1 flex flex-col gap-1">
+              <div style={{ padding: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {consultasDia.map(c => (
-                  <a key={c.id} href={`/dashboard/agenda/${c.id}`} className="text-xs px-1.5 py-1 rounded hover:opacity-80" style={{ background: 'var(--' + c.status + '-fill)', color: 'var(--' + c.status + '-ink)' }}>
-                    <p className="font-medium truncate">{c.patients?.name ?? 'Paciente'}</p>
-                    <p>{new Date(c.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                  <a key={c.id} href={`/dashboard/agenda/${c.id}`} style={{ fontSize: 11, padding: '4px 6px', borderRadius: 6, background: 'var(--' + c.status + '-fill)', color: 'var(--' + c.status + '-ink)', display: 'block', opacity: 1 }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                  >
+                    <p style={{ margin: 0, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.patients?.name ?? 'Paciente'}</p>
+                    <p style={{ margin: 0 }}>{new Date(c.scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
                   </a>
                 ))}
               </div>
@@ -249,14 +252,14 @@ export default function AgendaView({ consultas, servicos }: Props) {
 
     return (
       <div>
-        <div className="grid grid-cols-7 border-b border-gray-100">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid var(--border-divider)' }}>
           {semanas.map(s => (
-            <div key={s} className="px-2 py-2 text-center text-xs text-gray-500 font-medium">{s}</div>
+            <div key={s} style={{ padding: '8px', textAlign: 'center', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>{s}</div>
           ))}
         </div>
-        <div className="grid grid-cols-7 divide-x divide-y divide-gray-100">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
           {celulas.map((dia, i) => {
-            if (!dia) return <div key={i} className="min-h-20 bg-gray-50" />
+            if (!dia) return <div key={i} style={{ minHeight: 80, background: 'var(--surface-app)', borderRight: '1px solid var(--border-divider)', borderBottom: '1px solid var(--border-divider)' }} />
 
             const consultasDia = consultasFiltradas.filter(c => {
               const d = new Date(c.scheduled_at)
@@ -265,18 +268,18 @@ export default function AgendaView({ consultas, servicos }: Props) {
             const hoje = dia.toDateString() === new Date().toDateString()
 
             return (
-              <div key={i} className="min-h-20 p-1">
-                <p className={`text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full ${hoje ? 'bg-blue-600 text-white' : 'text-gray-600'}`}>
+              <div key={i} style={{ minHeight: 80, padding: 4, borderRight: '1px solid var(--border-divider)', borderBottom: '1px solid var(--border-divider)' }}>
+                <p style={{ margin: '0 0 4px', fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-medium)', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: hoje ? 'var(--brand)' : 'transparent', color: hoje ? 'white' : 'var(--text-body)' }}>
                   {dia.getDate()}
                 </p>
-                <div className="flex flex-col gap-0.5">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {consultasDia.slice(0, 2).map(c => (
-                    <a key={c.id} href={`/dashboard/agenda/${c.id}`} className="text-xs px-1 py-0.5 rounded truncate hover:opacity-80" style={{ background: 'var(--' + c.status + '-fill)', color: 'var(--' + c.status + '-ink)' }}>
+                    <a key={c.id} href={`/dashboard/agenda/${c.id}`} style={{ fontSize: 10, padding: '2px 4px', borderRadius: 4, background: 'var(--' + c.status + '-fill)', color: 'var(--' + c.status + '-ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
                       {c.patients?.name ?? 'Paciente'}
                     </a>
                   ))}
                   {consultasDia.length > 2 && (
-                    <p className="text-xs text-gray-400">+{consultasDia.length - 2}</p>
+                    <p style={{ margin: 0, fontSize: 10, color: 'var(--text-faint)' }}>+{consultasDia.length - 2}</p>
                   )}
                 </div>
               </div>

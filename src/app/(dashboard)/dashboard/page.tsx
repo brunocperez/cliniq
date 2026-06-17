@@ -22,8 +22,8 @@ export default async function DashboardPage() {
     .eq('archived', false)
 
   const hoje = new Date()
-  const inicioDia = new Date(hoje.setHours(0, 0, 0, 0)).toISOString()
-  const fimDia = new Date(hoje.setHours(23, 59, 59, 999)).toISOString()
+  const inicioDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 0, 0, 0).toISOString()
+  const fimDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23, 59, 59).toISOString()
 
   const { count: consultasHoje } = await supabase
     .from('appointments')
@@ -31,6 +31,29 @@ export default async function DashboardPage() {
     .eq('tenant_id', tenantId)
     .gte('scheduled_at', inicioDia)
     .lte('scheduled_at', fimDia)
+    .not('status', 'in', '("cancelado","faltou")')
+
+  const { data: consultasHojeDetalhes } = await supabase
+    .from('appointments')
+    .select('*, patients(name)')
+    .eq('tenant_id', tenantId)
+    .gte('scheduled_at', inicioDia)
+    .lte('scheduled_at', fimDia)
+    .not('status', 'in', '("cancelado","faltou")')
+    .order('scheduled_at', { ascending: true })
+
+  const { data: consultasRealizadas } = await supabase
+    .from('appointments')
+    .select('services(price)')
+    .eq('tenant_id', tenantId)
+    .eq('status', 'realizado')
+    .gte('scheduled_at', inicioDia)
+    .lte('scheduled_at', fimDia)
+
+  const receitaHoje = consultasRealizadas?.reduce((acc, c) => {
+    const price = (c.services as unknown as { price: number } | null)?.price ?? 0
+    return acc + Number(price)
+  }, 0) ?? 0
 
   const { data: proximasConsultas } = await supabase
     .from('appointments')
@@ -41,21 +64,75 @@ export default async function DashboardPage() {
     .order('scheduled_at', { ascending: true })
     .limit(5)
 
+  const temConsultasHoje = (consultasHoje ?? 0) > 0
+
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-lg font-medium">Olá, {profile?.full_name} 👋</h1>
-        <p className="text-sm text-gray-500">Aqui está o resumo do seu consultório</p>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
+          Olá, {profile?.full_name} 👋
+        </h1>
+        <p style={{ margin: '2px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+          Aqui está o resumo do seu consultório
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="rounded-xl p-5 text-white" style={{ backgroundColor: '#0F6E56' }}>
-          <p className="text-xs mb-1 opacity-80">Total de pacientes</p>
-          <p className="text-2xl font-medium">{totalPacientes ?? 0}</p>
+      {/* Banner de consultas hoje */}
+      {temConsultasHoje && (
+        <div style={{
+          background: 'var(--cliniq-50)',
+          border: '1px solid var(--cliniq-500)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '12px 20px',
+          marginBottom: 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 18 }}>📅</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--brand)' }}>
+                Você tem {consultasHoje} consulta{(consultasHoje ?? 0) > 1 ? 's' : ''} hoje
+              </p>
+              {consultasHojeDetalhes && consultasHojeDetalhes.length > 0 && (
+                <p style={{ margin: '2px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+                  Próxima: {(consultasHojeDetalhes[0].patients as { name: string } | null)?.name ?? 'Paciente'} às{' '}
+                  {new Date(consultasHojeDetalhes[0].scheduled_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              )}
+            </div>
+          </div>
+          <Link href="/dashboard/agenda" style={{ fontSize: 'var(--text-xs)', color: 'var(--brand)', fontWeight: 'var(--weight-medium)' }}>
+            Ver agenda →
+          </Link>
         </div>
-        <div className="rounded-xl p-5 text-white" style={{ backgroundColor: '#1D9E75' }}>
-          <p className="text-xs mb-1 opacity-80">Consultas hoje</p>
-          <p className="text-2xl font-medium">{consultasHoje ?? 0}</p>
+      )}
+
+      {/* Cards de métricas */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+        <div style={{ borderRadius: 'var(--radius-lg)', padding: 20, color: 'white', background: 'var(--brand)' }}>
+          <p style={{ margin: 0, fontSize: 'var(--text-xs)', opacity: 0.8 }}>Total de pacientes</p>
+          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-medium)' }}>{totalPacientes ?? 0}</p>
+        </div>
+        <div style={{ borderRadius: 'var(--radius-lg)', padding: 20, color: 'white', background: 'var(--cliniq-500)' }}>
+          <p style={{ margin: 0, fontSize: 'var(--text-xs)', opacity: 0.8 }}>Consultas hoje</p>
+          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-medium)' }}>{consultasHoje ?? 0}</p>
+        </div>
+        <div style={{ borderRadius: 'var(--radius-lg)', padding: 20, background: 'var(--surface-card)', border: '1px solid var(--border-default)' }}>
+          <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Receita hoje</p>
+          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
+            {receitaHoje.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+        <div style={{ borderRadius: 'var(--radius-lg)', padding: 20, background: 'var(--surface-card)', border: '1px solid var(--border-default)' }}>
+          <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Próxima consulta</p>
+          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
+            {proximasConsultas && proximasConsultas.length > 0
+              ? new Date(proximasConsultas[0].scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+              : '—'
+            }
+          </p>
         </div>
       </div>
 
@@ -63,7 +140,7 @@ export default async function DashboardPage() {
         title="Próximas consultas"
         padded={false}
         action={
-          <Link href="/dashboard/agenda" className="text-xs hover:opacity-70" style={{ color: '#0F6E56' }}>
+          <Link href="/dashboard/agenda" className="text-xs hover:opacity-70" style={{ color: 'var(--brand)' }}>
             Ver agenda →
           </Link>
         }
@@ -75,12 +152,13 @@ export default async function DashboardPage() {
                 key={consulta.id}
                 href={`/dashboard/agenda/${consulta.id}`}
                 className="px-5 py-3 flex items-center justify-between hover:bg-gray-50"
+                style={{ display: 'flex' }}
               >
                 <div>
-                  <p className="text-sm font-medium">
+                  <p style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
                     {(consulta.patients as { name: string } | null)?.name ?? 'Paciente'}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p style={{ margin: '2px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
                     {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
                       day: '2-digit', month: '2-digit',
                       hour: '2-digit', minute: '2-digit',
@@ -92,7 +170,7 @@ export default async function DashboardPage() {
             ))}
           </div>
         ) : (
-          <p className="px-5 py-8 text-sm text-center text-gray-400">
+          <p style={{ padding: '32px 20px', fontSize: 'var(--text-sm)', textAlign: 'center', color: 'var(--text-faint)' }}>
             Nenhuma consulta agendada.
           </p>
         )}

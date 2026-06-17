@@ -62,7 +62,7 @@ export default function ServicosView({ servicos }: Props) {
                   <td className="px-4 py-3" style={{ fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>{servico.name}</td>
                   <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{servico.duration_minutes} min</td>
                   <td className="px-4 py-3" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                    {servico.price ? `R$ ${Number(servico.price).toFixed(2)}` : '—'}
+                    {servico.price ? servico.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—'}
                   </td>
                   <td className="px-4 py-3" style={{ textAlign: 'right' }}>
                     <button
