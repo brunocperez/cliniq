@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
 @theme {
+  --color-cliniq-700: #0B5443;
   --color-cliniq-600: #0F6E56;
   --color-cliniq-500: #1D9E75;
   --color-cliniq-400: #5DCAA5;
+  --color-cliniq-200: #A7E2CC;
   --color-cliniq-50: #E1F5EE;
+
+  --color-confirmado-fill: #DCFCE7;
+  --color-confirmado-ink: #15803D;
+  --color-agendado-fill: #FEF9C3;
+  --color-agendado-ink: #A16207;
 }
 
 :root {
