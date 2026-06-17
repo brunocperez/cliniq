@@ -2,22 +2,36 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import Link from 'next/link'
 import PhoneInput from '@/components/ui/PhoneInput'
+import Button from '@/components/ui/Button'
+import Card from '@/components/ui/Card'
 
 const especialidades = [
-  'Odontologia',
-  'Psicologia',
-  'Fisioterapia',
-  'Nutrição',
-  'Fonoaudiologia',
-  'Dermatologia',
-  'Cardiologia',
-  'Ortopedia',
-  'Ginecologia',
-  'Pediatria',
-  'Clínica Geral',
-  'Outra',
+  'Odontologia', 'Psicologia', 'Fisioterapia', 'Nutrição', 'Fonoaudiologia',
+  'Dermatologia', 'Cardiologia', 'Ortopedia', 'Ginecologia', 'Pediatria',
+  'Clínica Geral', 'Outra',
 ]
+
+const inputStyle = {
+  width: '100%',
+  border: '1px solid var(--border-default)',
+  borderRadius: 'var(--radius-md)',
+  padding: '8px 12px',
+  fontSize: 'var(--text-sm)',
+  fontFamily: 'var(--font-sans)',
+  outline: 'none',
+  boxSizing: 'border-box' as const,
+  color: 'var(--text-body)',
+  background: 'var(--surface-card)',
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: 'var(--text-xs)',
+  color: 'var(--text-muted)',
+  marginBottom: 4,
+}
 
 export default function EditarTenantPage() {
   const router = useRouter()
@@ -56,14 +70,7 @@ export default function EditarTenantPage() {
     const res = await fetch(`/api/tenants/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nomeConsultorio,
-        especialidade,
-        whatsappConsultorio,
-        nomeResponsavel,
-        whatsappResponsavel,
-        profileId,
-      }),
+      body: JSON.stringify({ nomeConsultorio, especialidade, whatsappConsultorio, nomeResponsavel, whatsappResponsavel, profileId }),
     })
 
     const data = await res.json()
@@ -79,84 +86,53 @@ export default function EditarTenantPage() {
 
   return (
     <div className="max-w-lg">
-      <div className="mb-6">
-        <a href={`/admin/tenants/${id}`} className="text-sm hover:opacity-70"
-style={{ color: '#0F6E56' }}>← Voltar</a>
-        <h1 className="text-lg font-medium mt-2">Editar tenant</h1>
+      <div style={{ marginBottom: 24 }}>
+        <Link href={`/admin/tenants/${id}`} className="text-sm hover:opacity-70" style={{ color: 'var(--brand)' }}>← Voltar</Link>
+        <h1 style={{ margin: '8px 0 0', fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Editar tenant</h1>
       </div>
 
       {erro && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">
+        <div style={{ background: 'var(--danger-50)', border: '1px solid var(--danger-200)', color: 'var(--danger-600)', borderRadius: 'var(--radius-md)', padding: '8px 12px', fontSize: 'var(--text-sm)', marginBottom: 16 }}>
           {erro}
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="text-sm font-medium mb-4">Dados do consultório</h2>
-        <div className="flex flex-col gap-4">
+      <Card title="Dados do consultório" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Nome do consultório</label>
-            <input
-              type="text"
-              value={nomeConsultorio}
-              onChange={e => setNomeConsultorio(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-            />
+            <label style={labelStyle}>Nome do consultório</label>
+            <input type="text" value={nomeConsultorio} onChange={e => setNomeConsultorio(e.target.value)} style={inputStyle} />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Especialidade</label>
-            <select
-              value={especialidade}
-              onChange={e => setEspecialidade(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-            >
+            <label style={labelStyle}>Especialidade</label>
+            <select value={especialidade} onChange={e => setEspecialidade(e.target.value)} style={inputStyle}>
               <option value="">Selecione uma especialidade</option>
-              {especialidades.map(e => (
-                <option key={e} value={e}>{e}</option>
-              ))}
+              {especialidades.map(e => <option key={e} value={e}>{e}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">WhatsApp do consultório</label>
-            <PhoneInput
-              value={whatsappConsultorio}
-              onChange={setWhatsappConsultorio}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-            />
+            <label style={labelStyle}>WhatsApp do consultório</label>
+            <PhoneInput value={whatsappConsultorio} onChange={setWhatsappConsultorio} style={inputStyle} />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-        <h2 className="text-sm font-medium mb-4">Dados do responsável</h2>
-        <div className="flex flex-col gap-4">
+      <Card title="Dados do responsável" style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Nome do responsável</label>
-            <input
-              type="text"
-              value={nomeResponsavel}
-              onChange={e => setNomeResponsavel(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-            />
+            <label style={labelStyle}>Nome do responsável</label>
+            <input type="text" value={nomeResponsavel} onChange={e => setNomeResponsavel(e.target.value)} style={inputStyle} />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">WhatsApp do responsável</label>
-            <PhoneInput
-              value={whatsappResponsavel}
-              onChange={setWhatsappResponsavel}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-            />
+            <label style={labelStyle}>WhatsApp do responsável</label>
+            <PhoneInput value={whatsappResponsavel} onChange={setWhatsappResponsavel} style={inputStyle} />
           </div>
         </div>
-      </div>
+      </Card>
 
-      <button
-        onClick={handleSalvar}
-        disabled={loading}
-        className="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
-      >
+      <Button onClick={handleSalvar} disabled={loading} style={{ width: '100%' }}>
         {loading ? 'Salvando...' : 'Salvar alterações'}
-      </button>
+      </Button>
     </div>
   )
 }
