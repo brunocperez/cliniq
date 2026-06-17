@@ -21,7 +21,8 @@ export default async function ServicosPage() {
         <h1 className="text-lg font-medium">Serviços</h1>
         <a
           href="/dashboard/servicos/novo"
-          className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:opacity-90"
+          className="text-sm text-white px-4 py-2 rounded-lg hover:opacity-90"
+          style={{ backgroundColor: 'var(--brand)' }}
         >
           + Novo serviço
         </a>

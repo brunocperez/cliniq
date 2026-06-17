@@ -27,7 +27,8 @@ export default async function AgendaPage() {
         <h1 className="text-lg font-medium">Agenda</h1>
         <Link
           href="/dashboard/agenda/nova"
-          className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:opacity-90"
+          className="text-sm text-white px-4 py-2 rounded-lg hover:opacity-90"
+          style={{ backgroundColor: 'var(--brand)' }}
         >
           + Nova consulta
         </Link>

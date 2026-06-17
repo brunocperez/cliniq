@@ -217,9 +217,9 @@ export default function AgendaView({ consultas, servicos }: Props) {
 
           return (
             <div key={i} className="min-h-32">
-              <div className={`px-2 py-2 text-center border-b border-gray-100 ${hoje ? 'bg-blue-50' : ''}`}>
+              <div style={{ padding: '8px', textAlign: 'center', borderBottom: '1px solid var(--border-divider)', background: hoje ? 'var(--cliniq-50)' : 'transparent' }}>
                 <p className="text-xs text-gray-500 capitalize">{getNomeSemana(dia)}</p>
-                <p className={`text-sm font-medium ${hoje ? 'text-blue-600' : ''}`}>{dia.getDate()}</p>
+                <p style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: hoje ? 'var(--brand)' : 'var(--text-body)' }}>{dia.getDate()}</p>
               </div>
               <div className="p-1 flex flex-col gap-1">
                 {consultasDia.map(c => (

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import Button from '@/components/ui/Button'
 
 interface Servico {
   id: string
@@ -81,7 +82,6 @@ export default function RetornoModal({ consultaId, pacienteId, tenantId, onFecha
 
     if (new Date() > dtInicio) return 'passado'
 
-    // Verifica se todos os blocos necessários estão livres
     for (let b = 0; b < blocosOcupados; b++) {
       const idx = horarioIdx + b
       if (idx >= HORARIOS.length) return 'indisponivel'
@@ -133,35 +133,43 @@ export default function RetornoModal({ consultaId, pacienteId, tenantId, onFecha
     router.refresh()
   }
 
+  const inputStyle = {
+    width: '100%',
+    border: '1px solid var(--border-default)',
+    borderRadius: 'var(--radius-md)',
+    padding: '8px 12px',
+    fontSize: 'var(--text-sm)',
+    fontFamily: 'var(--font-sans)',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+    color: 'var(--text-body)',
+    background: 'var(--surface-card)',
+  }
+
   return (
     <div
-      style={{ background: 'rgba(0,0,0,0.4)' }}
-      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      style={{ background: 'rgba(0,0,0,0.4)', position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}
       onClick={onFechar}
     >
       <div
-        className="bg-white rounded-xl border border-gray-200 w-full max-w-3xl max-h-screen overflow-y-auto"
+        style={{ background: 'var(--surface-card)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-default)', width: '100%', maxWidth: 768, maxHeight: '90vh', overflowY: 'auto' }}
         onClick={e => e.stopPropagation()}
       >
-        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-sm font-medium">Marcar retorno</h2>
-          <button onClick={onFechar} className="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Marcar retorno</h2>
+          <button onClick={onFechar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 18 }}>✕</button>
         </div>
 
-        <div className="p-5">
+        <div style={{ padding: 20 }}>
           {erro && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">
+            <div style={{ background: 'var(--danger-50)', border: '1px solid var(--danger-200)', color: 'var(--danger-600)', borderRadius: 'var(--radius-md)', padding: '8px 12px', fontSize: 'var(--text-sm)', marginBottom: 16 }}>
               {erro}
             </div>
           )}
 
-          <div className="mb-4">
-            <label className="block text-xs text-gray-500 mb-1">Serviço do retorno</label>
-            <select
-              value={servicoId}
-              onChange={e => setServicoId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-            >
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 4 }}>Serviço do retorno</label>
+            <select value={servicoId} onChange={e => setServicoId(e.target.value)} style={inputStyle}>
               <option value="">Selecione um serviço (opcional)</option>
               {servicos.map(s => (
                 <option key={s.id} value={s.id}>{s.name} · {s.duration_minutes} min</option>
@@ -169,44 +177,30 @@ export default function RetornoModal({ consultaId, pacienteId, tenantId, onFecha
             </select>
           </div>
 
-          <div className="flex items-center justify-between mb-3">
-            <button
-              onClick={() => {
-                const nova = new Date(semanaAtual)
-                nova.setDate(nova.getDate() - 7)
-                setSemanaAtual(nova)
-              }}
-              className="text-sm px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
-            >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <Button variant="secondary" size="sm" onClick={() => { const nova = new Date(semanaAtual); nova.setDate(nova.getDate() - 7); setSemanaAtual(nova) }}>
               ← Semana anterior
-            </button>
-            <span className="text-sm text-gray-600">
+            </Button>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>
               {dias[0].toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} –{' '}
               {dias[6].toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
-            <button
-              onClick={() => {
-                const nova = new Date(semanaAtual)
-                nova.setDate(nova.getDate() + 7)
-                setSemanaAtual(nova)
-              }}
-              className="text-sm px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
-            >
+            <Button variant="secondary" size="sm" onClick={() => { const nova = new Date(semanaAtual); nova.setDate(nova.getDate() + 7); setSemanaAtual(nova) }}>
               Próxima semana →
-            </button>
+            </Button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs border-collapse">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)' }}>
               <thead>
                 <tr>
-                  <th className="w-16 px-2 py-2 text-gray-400 font-normal text-left">Hora</th>
+                  <th style={{ width: 64, padding: '8px', color: 'var(--text-faint)', fontWeight: 'normal', textAlign: 'left' }}>Hora</th>
                   {dias.map((dia, i) => {
                     const hoje = dia.toDateString() === new Date().toDateString()
                     return (
-                      <th key={i} className={`px-2 py-2 text-center font-medium ${hoje ? 'text-blue-600' : 'text-gray-600'}`}>
-                        <div className="capitalize">{dia.toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
-                        <div className={`w-6 h-6 mx-auto flex items-center justify-center rounded-full ${hoje ? 'bg-blue-600 text-white' : ''}`}>
+                      <th key={i} style={{ padding: '8px', textAlign: 'center', fontWeight: 'var(--weight-medium)', color: hoje ? 'var(--brand)' : 'var(--text-body)' }}>
+                        <div style={{ textTransform: 'capitalize' }}>{dia.toLocaleDateString('pt-BR', { weekday: 'short' })}</div>
+                        <div style={{ width: 24, height: 24, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', background: hoje ? 'var(--brand)' : 'transparent', color: hoje ? 'white' : 'inherit' }}>
                           {dia.getDate()}
                         </div>
                       </th>
@@ -214,46 +208,70 @@ export default function RetornoModal({ consultaId, pacienteId, tenantId, onFecha
                   })}
                 </tr>
               </thead>
-                <tbody>
-                    {HORARIOS.map((horario, horarioIdx) => {
-                        if (horarioIdx % blocosOcupados !== 0) return null
+              <tbody>
+                {HORARIOS.map((horario, horarioIdx) => {
+                  if (horarioIdx % blocosOcupados !== 0) return null
+
+                  return (
+                    <tr key={horario} style={{ borderTop: '1px solid var(--border-divider)' }}>
+                      <td style={{ padding: '6px 8px', color: 'var(--text-faint)', verticalAlign: 'top' }}>{horario}</td>
+                      {dias.map((dia, diaIdx) => {
+                        const status = blocoDisponivel(dia, horarioIdx)
+
+                        const bgColor = status === 'ocupado'
+                          ? 'var(--faltou-fill)'
+                          : status === 'disponivel'
+                          ? 'var(--realizado-fill)'
+                          : 'var(--surface-app)'
+
+                        const textColor = status === 'ocupado'
+                          ? 'var(--faltou-ink)'
+                          : status === 'disponivel'
+                          ? 'var(--realizado-ink)'
+                          : 'var(--text-faint)'
 
                         return (
-                        <tr key={horario} className="border-t border-gray-100">
-                            <td className="px-2 py-1.5 text-gray-400 align-top">{horario}</td>
-                            {dias.map((dia, diaIdx) => {
-                            const status = blocoDisponivel(dia, horarioIdx)
-
-                            return (
-                                <td key={diaIdx} className="px-1 py-1">
-                                <button
-                                    onClick={() => status === 'disponivel' && !loading && handleAgendar(dia, horario)}
-                                    disabled={status !== 'disponivel' || loading}
-                                    style={{ height: `${blocosOcupados * 32}px` }}
-                                    className={`w-full rounded text-xs transition-colors flex items-center justify-center ${
-                                    status === 'ocupado'
-                                        ? 'bg-red-50 text-red-400 cursor-not-allowed'
-                                        : status === 'passado' || status === 'indisponivel'
-                                        ? 'bg-gray-50 text-gray-300 cursor-not-allowed'
-                                        : 'bg-green-50 text-green-700 hover:bg-green-100 cursor-pointer'
-                                    }`}
-                                >
-                                    {status === 'ocupado' ? '✕' : status === 'disponivel' ? `${duracaoMin}min` : '—'}
-                                </button>
-                                </td>
-                            )
-                            })}
-                        </tr>
+                          <td key={diaIdx} style={{ padding: '4px' }}>
+                            <button
+                              onClick={() => status === 'disponivel' && !loading && handleAgendar(dia, horario)}
+                              disabled={status !== 'disponivel' || loading}
+                              style={{
+                                height: `${blocosOcupados * 32}px`,
+                                width: '100%',
+                                borderRadius: 'var(--radius-sm)',
+                                border: 'none',
+                                background: bgColor,
+                                color: textColor,
+                                fontSize: 'var(--text-xs)',
+                                cursor: status === 'disponivel' ? 'pointer' : 'not-allowed',
+                                fontFamily: 'var(--font-sans)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              {status === 'ocupado' ? '✕' : status === 'disponivel' ? `${duracaoMin}min` : '—'}
+                            </button>
+                          </td>
                         )
-                    })}
-                </tbody>
+                      })}
+                    </tr>
+                  )
+                })}
+              </tbody>
             </table>
           </div>
 
-          <div className="flex gap-4 mt-3 text-xs text-gray-400">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-50 border border-green-200 inline-block"></span> Disponível</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-red-50 border border-red-200 inline-block"></span> Ocupado</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-50 border border-gray-200 inline-block"></span> Passado</span>
+          <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 4, background: 'var(--realizado-fill)', border: '1px solid var(--realizado-ink)', display: 'inline-block' }}></span> Disponível
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 4, background: 'var(--faltou-fill)', border: '1px solid var(--faltou-ink)', display: 'inline-block' }}></span> Ocupado
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 4, background: 'var(--surface-app)', border: '1px solid var(--border-default)', display: 'inline-block' }}></span> Passado
+            </span>
           </div>
         </div>
       </div>
