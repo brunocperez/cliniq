@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { Trash2 } from 'lucide-react'
 import ConfirmModal from '@/components/ui/ConfirmModal'
-import Button from '@/components/ui/Button'
 
 interface Servico {
   id: string
@@ -19,90 +19,61 @@ interface Props {
 
 export default function ServicosView({ servicos }: Props) {
   const router = useRouter()
-  const [selecionados, setSelecionados] = useState<string[]>([])
+  const [excluindoId, setExcluindoId] = useState<string | null>(null)
   const [loadingAcao, setLoadingAcao] = useState(false)
-  const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false)
-
-  function toggleSelecionado(id: string) {
-    setSelecionados(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    )
-  }
-
-  function toggleTodos() {
-    if (selecionados.length === servicos.length) {
-      setSelecionados([])
-    } else {
-      setSelecionados(servicos.map(s => s.id))
-    }
-  }
 
   async function handleExcluir() {
+    if (!excluindoId) return
     setLoadingAcao(true)
     const supabase = createClient()
     await supabase
       .from('services')
       .delete()
-      .in('id', selecionados)
-    setSelecionados([])
+      .eq('id', excluindoId)
+    setExcluindoId(null)
     setLoadingAcao(false)
-    setMostrarModalExcluir(false)
     router.refresh()
   }
 
   return (
     <div>
-      {mostrarModalExcluir && (
+      {excluindoId && (
         <ConfirmModal
-          mensagem={`Excluir ${selecionados.length} serviço(s) permanentemente? Esta ação não pode ser desfeita.`}
+          mensagem="Excluir este serviço permanentemente? Esta ação não pode ser desfeita."
           onConfirmar={handleExcluir}
-          onCancelar={() => setMostrarModalExcluir(false)}
+          onCancelar={() => setExcluindoId(null)}
         />
       )}
 
       <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--surface-app)', borderBottom: '1px solid var(--border-divider)' }}>
-          <input
-            type="checkbox"
-            checked={selecionados.length === servicos.length && servicos.length > 0}
-            onChange={toggleTodos}
-            className="rounded"
-          />
-          {selecionados.length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{selecionados.length} selecionado(s)</span>
-              <Button variant="danger" size="sm" onClick={() => setMostrarModalExcluir(true)} disabled={loadingAcao}>
-                Excluir
-              </Button>
-            </div>
-          )}
-        </div>
-
         <table className="w-full text-sm">
           <thead>
             <tr style={{ background: 'var(--surface-app)', borderBottom: '1px solid var(--border-default)' }}>
-              <th className="w-10 px-4 py-3"></th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Nome</th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Duração</th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Valor</th>
+              <th style={{ width: 48 }}></th>
             </tr>
           </thead>
           <tbody>
             {servicos.length > 0 ? (
               servicos.map(servico => (
                 <tr key={servico.id} style={{ borderBottom: '1px solid var(--border-divider)' }}>
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selecionados.includes(servico.id)}
-                      onChange={() => toggleSelecionado(servico.id)}
-                      className="rounded"
-                    />
-                  </td>
                   <td className="px-4 py-3" style={{ fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>{servico.name}</td>
                   <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>{servico.duration_minutes} min</td>
-                  <td className="px-4 py-3" style={{ color: 'var(--text-muted)' }}>
+                  <td className="px-4 py-3" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                     {servico.price ? `R$ ${Number(servico.price).toFixed(2)}` : '—'}
+                  </td>
+                  <td className="px-4 py-3" style={{ textAlign: 'right' }}>
+                    <button
+                      onClick={() => setExcluindoId(servico.id)}
+                      disabled={loadingAcao}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-faint)', padding: 4, display: 'inline-flex', alignItems: 'center' }}
+                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--danger-600)')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-faint)')}
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))

@@ -15,43 +15,65 @@ export default async function PerfilPage() {
     ? profile.tenants[0]
     : profile?.tenants
 
+  const nome = profile?.responsible_name ?? profile?.full_name ?? ''
+  const iniciais = nome.split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase()
+
   return (
     <div className="max-w-lg">
       <div className="mb-6">
-        <h1 className="text-lg font-medium">Perfil do consultório</h1>
-        <p className="text-sm text-gray-500">Suas informações e configurações</p>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Perfil do consultório</h1>
+        <p style={{ margin: '4px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Suas informações e configurações</p>
       </div>
 
+      {/* Avatar */}
+      <Card style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: '50%',
+            background: 'var(--cliniq-50)', color: 'var(--brand)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 'var(--weight-bold)', fontSize: 18,
+            flexShrink: 0,
+          }}>
+            {iniciais || '?'}
+          </div>
+          <div>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>{nome || '—'}</p>
+            <p style={{ margin: '2px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{tenant?.name ?? '—'}</p>
+          </div>
+        </div>
+      </Card>
+
       <Card title="Dados do consultório" style={{ marginBottom: 16 }}>
-        <div className="flex flex-col gap-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Nome do consultório</p>
-            <p className="text-sm">{tenant?.name ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Nome do consultório</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{tenant?.name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Especialidade</p>
-            <p className="text-sm">{tenant?.specialty ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Especialidade</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{tenant?.specialty ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">WhatsApp do consultório</p>
-            <p className="text-sm">{tenant?.whatsapp_consultorio ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>WhatsApp do consultório</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{tenant?.whatsapp_consultorio ?? '—'}</p>
           </div>
         </div>
       </Card>
 
       <Card title="Dados do responsável">
-        <div className="flex flex-col gap-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Nome do responsável</p>
-            <p className="text-sm">{profile?.responsible_name ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>Nome do responsável</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{profile?.responsible_name ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">WhatsApp do responsável</p>
-            <p className="text-sm">{profile?.whatsapp_responsavel ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>WhatsApp do responsável</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{profile?.whatsapp_responsavel ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">E-mail de acesso</p>
-            <p className="text-sm">{user?.email ?? '—'}</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 2 }}>E-mail de acesso</p>
+            <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-body)' }}>{user?.email ?? '—'}</p>
           </div>
         </div>
       </Card>

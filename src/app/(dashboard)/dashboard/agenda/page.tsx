@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import AgendaView from '@/components/dashboard/AgendaView'
+import Button from '@/components/ui/Button'
 
 export default async function AgendaPage() {
   const supabase = await createServerSupabaseClient()
@@ -23,14 +24,13 @@ export default async function AgendaPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-lg font-medium">Agenda</h1>
-        <Link
-          href="/dashboard/agenda/nova"
-          className="text-sm text-white px-4 py-2 rounded-lg hover:opacity-90"
-          style={{ backgroundColor: 'var(--brand)' }}
-        >
-          + Nova consulta
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Agenda</h1>
+          <p style={{ margin: '2px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Todas as suas consultas</p>
+        </div>
+        <Link href="/dashboard/agenda/nova">
+          <Button>+ Nova consulta</Button>
         </Link>
       </div>
 

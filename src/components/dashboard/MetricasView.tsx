@@ -152,23 +152,28 @@ export default function MetricasView({
         <Card title="Status das consultas">
           {statusData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  dataKey="value"
-                  nameKey="status"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ name, percent }) => `${name} ${Math.round((percent ?? 0) * 100)}%`}
-                  labelLine={false}
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={index} fill={CORES_STATUS[entry.status] ?? '#888780'} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
+              <Card title="Status das consultas">
+                {statusData.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 4 }}>
+                    {statusData.map(({ status, value }) => {
+                      const total = statusData.reduce((a, b) => a + b.value, 0)
+                      const pct = Math.round((value / total) * 100)
+                      const fill = CORES_STATUS[status] ?? '#888780'
+                      return (
+                        <div key={status} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ width: 80, fontSize: 'var(--text-xs)', color: 'var(--text-muted)', textTransform: 'capitalize', flexShrink: 0 }}>{status}</span>
+                          <div style={{ flex: 1, height: 10, background: '#F3F4F6', borderRadius: 9999, overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', background: fill, borderRadius: 9999 }} />
+                          </div>
+                          <span style={{ width: 28, textAlign: 'right', fontSize: 'var(--text-xs)', color: 'var(--text-body)', fontFamily: 'var(--font-mono)', flexShrink: 0 }}>{value}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-faint)', textAlign: 'center', padding: '32px 0' }}>Sem dados ainda.</p>
+                )}
+              </Card>
             </ResponsiveContainer>
           ) : (
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-faint)', textAlign: 'center', padding: '32px 0' }}>Sem dados ainda.</p>

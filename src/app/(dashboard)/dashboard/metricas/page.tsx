@@ -58,9 +58,9 @@ export default async function MetricasPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-lg font-medium">Métricas</h1>
-        <p className="text-sm text-gray-500">Visão geral do seu consultório</p>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Métricas</h1>
+        <p style={{ margin: '2px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Desempenho do seu consultório</p>
       </div>
 
       <MetricasView

@@ -17,8 +17,9 @@ export default async function PacientesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-lg font-medium">Pacientes</h1>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Pacientes</h1>
+        <p style={{ margin: '2px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Gerencie os pacientes do seu consultório</p>
       </div>
       <PacientesView pacientes={pacientes ?? []} />
     </div>
