@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -100,7 +101,12 @@ export default function LoginPage() {
           {loading ? 'Entrando...' : 'Entrar'}
         </Button>
 
+        <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 16 }}>
+          Ainda não tem conta?{' '}
+          <Link href="/cadastro" style={{ color: 'var(--brand)' }}>Criar conta gratuita</Link>
+        </p>
+
+       </div>
       </div>
-    </div>
-  )
+     )
 }
