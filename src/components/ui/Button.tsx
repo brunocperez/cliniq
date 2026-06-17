@@ -22,7 +22,7 @@ const sizes = {
 const variants = {
   primary: {
     base: { background: 'var(--brand)', color: 'var(--text-on-brand)', border: '1px solid var(--brand)' },
-    hover: { background: 'var(--brand-hover)', borderColor: 'var(--brand-hover)' },
+    hover: { background: 'var(--brand-hover)', border: '1px solid var(--brand-hover)' },
   },
   secondary: {
     base: { background: 'var(--surface-card)', color: 'var(--text-body)', border: '1px solid var(--border-default)' },
