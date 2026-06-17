@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Button from '@/components/ui/Button'
+import Card from '@/components/ui/Card'
 
 interface Servico {
   id: string
@@ -15,6 +17,26 @@ interface Paciente {
   id: string
   name: string
   phone: string
+}
+
+const inputStyle = {
+  width: '100%',
+  border: '1px solid var(--border-default)',
+  borderRadius: 'var(--radius-md)',
+  padding: '8px 12px',
+  fontSize: 'var(--text-sm)',
+  fontFamily: 'var(--font-sans)',
+  outline: 'none',
+  boxSizing: 'border-box' as const,
+  color: 'var(--text-body)',
+  background: 'var(--surface-card)',
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: 'var(--text-xs)',
+  color: 'var(--text-muted)',
+  marginBottom: 4,
 }
 
 export default function NovaConsultaPage() {
@@ -73,15 +95,12 @@ export default function NovaConsultaPage() {
 
     const scheduledAt = new Date(`${data}T${hora}:00`).toISOString()
 
-    // Busca duração do serviço selecionado
     const servicoSelecionado = servicos.find(s => s.id === servicoId)
     const duracao = servicoSelecionado?.duration_minutes ?? 60
 
-    // Calcula fim da nova consulta
     const novoInicio = new Date(scheduledAt)
     const novoFim = new Date(novoInicio.getTime() + duracao * 60000)
 
-    // Busca consultas no mesmo dia
     const inicioDia = new Date(`${data}T00:00:00`).toISOString()
     const fimDia = new Date(`${data}T23:59:59`).toISOString()
 
@@ -93,12 +112,10 @@ export default function NovaConsultaPage() {
       .lte('scheduled_at', fimDia)
       .not('status', 'in', '("cancelado","faltou")')
 
-    // Verifica conflito de horário
     const temConflito = consultasExistentes?.some(c => {
       const existenteInicio = new Date(c.scheduled_at)
       const duracaoExistente = (c.services as unknown as { duration_minutes: number } | null)?.duration_minutes ?? 60
       const existenteFim = new Date(existenteInicio.getTime() + duracaoExistente * 60000)
-
       return novoInicio < existenteFim && novoFim > existenteInicio
     })
 
@@ -130,81 +147,53 @@ export default function NovaConsultaPage() {
   return (
     <div className="max-w-md">
       <div className="mb-6">
-        <Link href="/dashboard/agenda" className="text-sm hover:opacity-70"
-style={{ color: '#0F6E56' }}>← Voltar</Link>
-        <h1 className="text-lg font-medium mt-2">Nova consulta</h1>
+        <Link href="/dashboard/agenda" className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>← Voltar</Link>
+        <h1 className="text-lg font-medium mt-2" style={{ color: 'var(--text-strong)' }}>Nova consulta</h1>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col gap-4">
+      <Card>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {erro && (
+            <div style={{ background: 'var(--danger-50)', border: '1px solid var(--danger-200)', color: 'var(--danger-600)', borderRadius: 'var(--radius-md)', padding: '8px 12px', fontSize: 'var(--text-sm)' }}>
+              {erro}
+            </div>
+          )}
 
-        {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm">
-            {erro}
+          <div>
+            <label style={labelStyle}>Paciente</label>
+            <select value={pacienteId} onChange={e => setPacienteId(e.target.value)} style={inputStyle}>
+              <option value="">Selecione um paciente</option>
+              {pacientes.map(p => (
+                <option key={p.id} value={p.id}>{p.name ?? p.phone}</option>
+              ))}
+            </select>
           </div>
-        )}
 
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Paciente</label>
-          <select
-            value={pacienteId}
-            onChange={e => setPacienteId(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          >
-            <option value="">Selecione um paciente</option>
-            {pacientes.map(p => (
-              <option key={p.id} value={p.id}>
-                {p.name ?? p.phone}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label style={labelStyle}>Serviço</label>
+            <select value={servicoId} onChange={e => setServicoId(e.target.value)} style={inputStyle}>
+              <option value="">Selecione um serviço (opcional)</option>
+              {servicos.map(s => (
+                <option key={s.id} value={s.id}>{s.name} · {s.duration_minutes} min</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Data</label>
+            <input type="date" value={data} onChange={e => setData(e.target.value)} style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Hora</label>
+            <input type="time" value={hora} onChange={e => setHora(e.target.value)} style={inputStyle} />
+          </div>
+
+          <Button onClick={handleCriar} disabled={loading} style={{ width: '100%', marginTop: 4 }}>
+            {loading ? 'Salvando...' : 'Agendar consulta'}
+          </Button>
         </div>
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Serviço</label>
-          <select
-            value={servicoId}
-            onChange={e => setServicoId(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          >
-            <option value="">Selecione um serviço (opcional)</option>
-            {servicos.map(s => (
-              <option key={s.id} value={s.id}>
-                {s.name} · {s.duration_minutes} min
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Data</label>
-          <input
-            type="date"
-            value={data}
-            onChange={e => setData(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Hora</label>
-          <input
-            type="time"
-            value={hora}
-            onChange={e => setHora(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          />
-        </div>
-
-        <button
-          onClick={handleCriar}
-          disabled={loading}
-          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50 mt-2"
-          style={{ backgroundColor: '#0F6E56' }}
-        >
-          {loading ? 'Salvando...' : 'Agendar consulta'}
-        </button>
-
-      </div>
+      </Card>
     </div>
   )
 }
