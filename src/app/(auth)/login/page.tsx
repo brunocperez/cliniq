@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
+import Button from '@/components/ui/Button'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -42,54 +43,62 @@ export default function LoginPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm">
+  const inputStyle = {
+    width: '100%',
+    border: '1px solid var(--border-default)',
+    borderRadius: 'var(--radius-md)',
+    padding: '8px 12px',
+    fontSize: 'var(--text-sm)',
+    fontFamily: 'var(--font-sans)',
+    outline: 'none',
+    boxSizing: 'border-box' as const,
+    color: 'var(--text-body)',
+    background: 'var(--surface-card)',
+  }
 
-        <div className="mb-6">
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-app)' }}>
+      <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 32, width: '100%', maxWidth: 360 }}>
+
+        <div style={{ marginBottom: 24 }}>
           <Image src="/logo.svg" alt="Cliniq" width={120} height={36} />
         </div>
 
-        <h1 className="text-lg font-medium mb-1">Gestão de consultório simplificada</h1>
-        <p className="text-sm text-gray-500 mb-6">Entrar na sua conta</p>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Entrar na sua conta</h1>
+        <p style={{ margin: '4px 0 24px', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Gestão de consultório simplificada</p>
 
         {erro && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">
+          <div style={{ background: 'var(--danger-50)', border: '1px solid var(--danger-200)', color: 'var(--danger-600)', borderRadius: 'var(--radius-md)', padding: '8px 12px', fontSize: 'var(--text-sm)', marginBottom: 16 }}>
             {erro}
           </div>
         )}
 
-        <div className="mb-4">
-          <label className="block text-xs text-gray-500 mb-1">E-mail</label>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 4 }}>E-mail</label>
           <input
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="voce@email.com"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            style={inputStyle}
           />
         </div>
 
-        <div className="mb-5">
-          <label className="block text-xs text-gray-500 mb-1">Senha</label>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginBottom: 4 }}>Senha</label>
           <input
             type="password"
             value={senha}
             onChange={e => setSenha(e.target.value)}
             placeholder="••••••••"
             onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            style={inputStyle}
           />
         </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full text-white rounded-lg py-2 text-sm font-medium disabled:opacity-50"
-          style={{ backgroundColor: '#0F6E56' }}
-        >
+        <Button onClick={handleLogin} disabled={loading} style={{ width: '100%' }}>
           {loading ? 'Entrando...' : 'Entrar'}
-        </button>
+        </Button>
 
       </div>
     </div>

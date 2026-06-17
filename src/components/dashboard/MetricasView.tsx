@@ -4,6 +4,7 @@ import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts'
+import Card from '@/components/ui/Card'
 
 interface Consulta {
   scheduled_at: string
@@ -33,6 +34,13 @@ function getServico(services: Consulta['services']): { name: string; price: numb
   if (!services) return null
   if (Array.isArray(services)) return services[0] ?? null
   return services
+}
+
+const metricCardStyle = {
+  background: 'var(--surface-card)',
+  border: '1px solid var(--border-default)',
+  borderRadius: 'var(--radius-lg)',
+  padding: '20px',
 }
 
 export default function MetricasView({
@@ -98,37 +106,25 @@ export default function MetricasView({
   })()
 
   return (
-    <div className="flex flex-col gap-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Total de pacientes</p>
-          <p className="text-2xl font-medium">{totalPacientes}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Total de consultas</p>
-          <p className="text-2xl font-medium">{totalConsultas}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Consultas realizadas</p>
-          <p className="text-2xl font-medium">{totalRealizadas}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Taxa de no-show</p>
-          <p className="text-2xl font-medium">{taxaNoShow}%</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Consultas perdidas</p>
-          <p className="text-2xl font-medium">{totalFaltou}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <p className="text-xs text-gray-500 mb-1">Receita total</p>
-          <p className="text-2xl font-medium">R$ {receitaTotal.toFixed(2)}</p>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        {[
+          { label: 'Total de pacientes', value: totalPacientes },
+          { label: 'Total de consultas', value: totalConsultas },
+          { label: 'Consultas realizadas', value: totalRealizadas },
+          { label: 'Taxa de no-show', value: `${taxaNoShow}%` },
+          { label: 'Consultas perdidas', value: totalFaltou },
+          { label: 'Receita total', value: `R$ ${receitaTotal.toFixed(2)}` },
+        ].map(({ label, value }) => (
+          <div key={label} style={metricCardStyle}>
+            <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{label}</p>
+            <p style={{ margin: '4px 0 0', fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>{value}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <h2 className="text-sm font-medium mb-4">Consultas por mês</h2>
+      <Card title="Consultas por mês">
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={consultasPorMes}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -138,10 +134,9 @@ export default function MetricasView({
             <Bar dataKey="total" fill="#378ADD" radius={[4, 4, 0, 0]} name="Consultas" />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </Card>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <h2 className="text-sm font-medium mb-4">Receita por mês (R$)</h2>
+      <Card title="Receita por mês (R$)">
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={receitaPorMes}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -151,11 +146,10 @@ export default function MetricasView({
             <Line type="monotone" dataKey="receita" stroke="#1D9E75" strokeWidth={2} dot={{ r: 4 }} name="Receita" />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </Card>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="text-sm font-medium mb-4">Status das consultas</h2>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <Card title="Status das consultas">
           {statusData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -166,9 +160,7 @@ export default function MetricasView({
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                    label={({ name, percent }) =>
-                    `${name} ${Math.round((percent ?? 0) * 100)}%`
-                    }
+                  label={({ name, percent }) => `${name} ${Math.round((percent ?? 0) * 100)}%`}
                   labelLine={false}
                 >
                   {statusData.map((entry, index) => (
@@ -179,12 +171,11 @@ export default function MetricasView({
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-gray-400 text-center py-8">Sem dados ainda.</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-faint)', textAlign: 'center', padding: '32px 0' }}>Sem dados ainda.</p>
           )}
-        </div>
+        </Card>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="text-sm font-medium mb-4">Consultas por serviço</h2>
+        <Card title="Consultas por serviço">
           {porServico.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={porServico} layout="vertical">
@@ -196,9 +187,9 @@ export default function MetricasView({
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-gray-400 text-center py-8">Sem dados ainda.</p>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-faint)', textAlign: 'center', padding: '32px 0' }}>Sem dados ainda.</p>
           )}
-        </div>
+        </Card>
       </div>
 
     </div>
