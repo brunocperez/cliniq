@@ -62,16 +62,24 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(new URL('/dashboard/trocar-senha', request.url))
       }
 
-      // Verifica se tenant está ativo
+      // Verifica se tenant está ativo e se o trial não expirou
       if (profile?.role !== 'admin' && profile?.tenant_id) {
         const { data: tenant } = await adminSupabase
           .from('tenants')
-          .select('is_active')
+          .select('is_active, trial_ends_at, plano')
           .eq('id', profile.tenant_id)
           .single()
 
         if (tenant && !tenant.is_active && path !== '/bloqueado') {
           return NextResponse.redirect(new URL('/bloqueado', request.url))
+        }
+
+        const trialExpirado = tenant?.plano === 'trial' &&
+          tenant?.trial_ends_at &&
+          new Date(tenant.trial_ends_at) < new Date()
+
+        if (trialExpirado && path !== '/trial-expirado') {
+          return NextResponse.redirect(new URL('/trial-expirado', request.url))
         }
       }
     }
