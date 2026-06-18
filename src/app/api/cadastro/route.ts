@@ -1,10 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
 import { Resend } from 'resend'
+import { rateLimit } from '@/lib/rateLimit'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for') ?? request.headers.get('x-real-ip') ?? 'unknown'
+  if (!rateLimit(ip, 5, 60)) {
+    return NextResponse.json({ error: 'Muitas tentativas. Tente novamente em alguns minutos.' }, { status: 429 })
+  }
   const { nomeConsultorio, nomeResponsavel, whatsappResponsavel, email, senha } = await request.json()
 
   if (!nomeConsultorio || !nomeResponsavel || !whatsappResponsavel || !email || !senha) {
