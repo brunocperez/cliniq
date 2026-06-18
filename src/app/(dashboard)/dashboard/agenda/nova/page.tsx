@@ -55,20 +55,14 @@ export default function NovaConsultaPage() {
     const supabase = createClient()
 
     async function carregar() {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('tenant_id')
-        .single()
-
       const { data: s } = await supabase
         .from('services')
         .select('id, name, duration_minutes')
-        .eq('tenant_id', profile?.tenant_id)
 
       const { data: p } = await supabase
         .from('patients')
         .select('id, name, phone')
-        .eq('tenant_id', profile?.tenant_id)
+        .eq('archived', false)
 
       setServicos(s ?? [])
       setPacientes(p ?? [])
@@ -86,7 +80,6 @@ export default function NovaConsultaPage() {
       return
     }
 
-    // Bloqueia datas e horários no passado
     const agora = new Date()
     const dataHoraSelecionada = new Date(`${data}T${hora}:00`)
     if (dataHoraSelecionada <= agora) {
@@ -95,57 +88,20 @@ export default function NovaConsultaPage() {
       return
     }
 
-    const supabase = createClient()
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('tenant_id')
-      .single()
-
-    const scheduledAt = new Date(`${data}T${hora}:00`).toISOString()
-
     const servicoSelecionado = servicos.find(s => s.id === servicoId)
     const duracao = servicoSelecionado?.duration_minutes ?? 60
+    const scheduledAt = new Date(`${data}T${hora}:00`).toISOString()
 
-    const novoInicio = new Date(scheduledAt)
-    const novoFim = new Date(novoInicio.getTime() + duracao * 60000)
-
-    const inicioDia = new Date(`${data}T00:00:00`).toISOString()
-    const fimDia = new Date(`${data}T23:59:59`).toISOString()
-
-    const { data: consultasExistentes } = await supabase
-      .from('appointments')
-      .select('scheduled_at, services(duration_minutes)')
-      .eq('tenant_id', profile?.tenant_id)
-      .gte('scheduled_at', inicioDia)
-      .lte('scheduled_at', fimDia)
-      .not('status', 'in', '("cancelado","faltou")')
-
-    const temConflito = consultasExistentes?.some(c => {
-      const existenteInicio = new Date(c.scheduled_at)
-      const duracaoExistente = (c.services as unknown as { duration_minutes: number } | null)?.duration_minutes ?? 60
-      const existenteFim = new Date(existenteInicio.getTime() + duracaoExistente * 60000)
-      return novoInicio < existenteFim && novoFim > existenteInicio
+    const res = await fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pacienteId, servicoId, scheduledAt, duracao }),
     })
 
-    if (temConflito) {
-      setErro('Já existe uma consulta neste horário. Escolha outro horário.')
-      setLoading(false)
-      return
-    }
+    const result = await res.json()
 
-    const { error } = await supabase
-      .from('appointments')
-      .insert({
-        tenant_id: profile?.tenant_id,
-        patient_id: pacienteId,
-        service_id: servicoId || null,
-        scheduled_at: scheduledAt,
-        status: 'agendado',
-      })
-
-    if (error) {
-      setErro('Erro ao criar consulta.')
+    if (!res.ok) {
+      setErro(result.error || 'Erro ao criar consulta.')
       setLoading(false)
       return
     }
