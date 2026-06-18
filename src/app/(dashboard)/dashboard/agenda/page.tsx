@@ -11,16 +11,24 @@ export default async function AgendaPage() {
     .select('tenant_id')
     .single()
 
-  const { data: consultas } = await supabase
-    .from('appointments')
-    .select('*, patients(name, phone), services(id, name)')
-    .eq('tenant_id', profile?.tenant_id)
-    .order('scheduled_at', { ascending: true })
+  // Carrega apenas 3 meses atrás até 3 meses à frente
+  const hoje = new Date()
+  const inicioJanela = new Date(hoje.getFullYear(), hoje.getMonth() - 3, 1).toISOString()
+  const fimJanela = new Date(hoje.getFullYear(), hoje.getMonth() + 3, 31).toISOString()
 
-  const { data: servicos } = await supabase
-    .from('services')
-    .select('id, name')
-    .eq('tenant_id', profile?.tenant_id)
+  const [{ data: consultas }, { data: servicos }] = await Promise.all([
+    supabase
+      .from('appointments')
+      .select('*, patients(name, phone), services(id, name)')
+      .eq('tenant_id', profile?.tenant_id)
+      .gte('scheduled_at', inicioJanela)
+      .lte('scheduled_at', fimJanela)
+      .order('scheduled_at', { ascending: true }),
+    supabase
+      .from('services')
+      .select('id, name')
+      .eq('tenant_id', profile?.tenant_id),
+  ])
 
   return (
     <div>
