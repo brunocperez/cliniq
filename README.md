@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cliniq — Gestão para Clínicas Odontológicas
 
-## Getting Started
+> SaaS multi-tenant desenvolvido do zero para simplificar a gestão de clínicas odontológicas — agenda, pacientes, métricas e cobrança em um só lugar.
 
-First, run the development server:
+## ✨ Funcionalidades
+
+- **Agenda inteligente** — visualização por lista, semana ou mês, com bloqueio automático de conflitos de horário
+- **Gestão de pacientes** — cadastro completo com histórico de consultas, observações clínicas e busca rápida
+- **Retornos** — agendamento de retorno com grade semanal dinâmica e sugestão de horários disponíveis
+- **Métricas em tempo real** — receita, taxa de comparecimento e desempenho por procedimento, com filtro por período
+- **Onboarding self-service** — cadastro público com trial de 30 dias, sem intervenção manual
+- **Cobrança recorrente** — geração automática de Pix mensal via Edge Function agendada, com bloqueio por inadimplência
+- **Painel administrativo** — gestão completa de tenants, cobranças e suporte
+- **Landing page** — página pública com fluxo de conversão direto para o cadastro
+
+## 🛠 Stack
+
+| Camada | Tecnologia |
+|---|---|
+| Front-end | Next.js 15, React 19, TypeScript, Tailwind CSS v4 |
+| Back-end | Supabase (PostgreSQL, Auth, RLS, Edge Functions) |
+| E-mail | Resend |
+| Automação | Supabase pg_cron + pg_net |
+| Deploy | Vercel (planejado) |
+
+## 🏗 Arquitetura
+
+- **Multi-tenant** com isolamento total de dados via Row Level Security (RLS) no PostgreSQL
+- **Middleware de autenticação** com verificação de role (admin/client), trial e status do tenant
+- **APIs protegidas** — `tenant_id` sempre resolvido no servidor, nunca enviado pelo cliente
+- **Rate limiting** nas rotas sensíveis (cadastro, reset de senha)
+- **Edge Functions** para lógica serverless agendada (cobrança mensal automatizada)
+
+## 📁 Estrutura
+
+src/
+├── app/
+│   ├── (auth)/          # Login, cadastro público
+│   ├── (dashboard)/     # Área do cliente
+│   ├── (admin)/         # Painel administrativo
+│   └── api/             # API routes
+├── components/
+│   ├── ui/              # Design system (Button, Card, StatusBadge...)
+│   ├── dashboard/       # Componentes do painel
+│   ├── admin/           # Componentes do admin
+│   └── landing/         # Seções da landing page
+└── lib/                 # Utilitários, clientes Supabase, rate limiting
+
+## 🚀 Rodando localmente
 
 ```bash
+# Clone o repositório
+git clone https://github.com/brunocperez/clinic-saas.git
+cd clinic-saas
+
+# Instale as dependências
+npm install
+
+# Configure as variáveis de ambiente
+cp .env.example .env.local
+# Preencha com suas chaves do Supabase e Resend
+
+# Rode o servidor de desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔑 Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
+NEXT_PUBLIC_APP_URL=
+```
 
-## Learn More
+## 📄 Licença
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este projeto é de uso pessoal e educacional.
