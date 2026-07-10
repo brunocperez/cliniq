@@ -1,7 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import Link from 'next/link'
 import AgendaView from '@/components/dashboard/AgendaView'
-import Button from '@/components/ui/Button'
 
 export default async function AgendaPage() {
   const supabase = await createServerSupabaseClient()
@@ -11,7 +9,6 @@ export default async function AgendaPage() {
     .select('tenant_id')
     .single()
 
-  // Carrega apenas 3 meses atrás até 3 meses à frente
   const hoje = new Date()
   const inicioJanela = new Date(hoje.getFullYear(), hoje.getMonth() - 3, 1).toISOString()
   const fimJanela = new Date(hoje.getFullYear(), hoje.getMonth() + 3, 31).toISOString()
@@ -37,14 +34,12 @@ export default async function AgendaPage() {
           <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Agenda</h1>
           <p style={{ margin: '2px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Todas as suas consultas</p>
         </div>
-        <Link href="/dashboard/agenda/nova">
-          <Button>+ Nova consulta</Button>
-        </Link>
       </div>
 
       <AgendaView
         consultas={consultas ?? []}
         servicos={servicos ?? []}
+        comModal
       />
     </div>
   )

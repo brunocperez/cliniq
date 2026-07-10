@@ -30,6 +30,7 @@ interface Consulta {
 interface Props {
   consultas: Consulta[]
   servicos: Servico[]
+  comModal?: boolean
 }
 
 type Visualizacao = 'lista' | 'semanal' | 'mensal'
@@ -50,7 +51,7 @@ function getInicioDoMes(data: Date) {
   return new Date(data.getFullYear(), data.getMonth(), 1)
 }
 
-export default function AgendaView({ consultas, servicos }: Props) {
+export default function AgendaView({ consultas, servicos, comModal = false }: Props) {
   const router = useRouter()
   const [visualizacao, setVisualizacao] = useState<Visualizacao>('semanal')
   const [filtroStatus, setFiltroStatus] = useState<Filtro>('todos')
