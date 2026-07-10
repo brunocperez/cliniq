@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import NavLink from '@/components/dashboard/NavLink'
 import LogoutButton from '@/components/dashboard/LogoutButton'
-import ThemeToggle from '@/components/ThemeToggle'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 
@@ -47,12 +46,7 @@ export default function Sidebar() {
         <NavLink href="/dashboard/perfil" icon="user" expandido={expandido}>Perfil</NavLink>
       </nav>
 
-      <div className="p-2 border-t border-white/10 flex flex-col gap-2">
-        {expandido && (
-          <div className="flex justify-end px-1">
-            <ThemeToggle />
-          </div>
-        )}
+      <div className="p-2 border-t border-white/10">
         <LogoutButton expandido={expandido} />
       </div>
     </aside>
