@@ -31,18 +31,18 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
         <Link href="/dashboard/pacientes" className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>← Voltar</Link>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+      <div className="bg-[var(--surface-card)] border border-[var(--border-default)] rounded-xl p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-lg font-medium text-gray-500">
+          <div className="w-12 h-12 rounded-full bg-[var(--surface-sunken)] flex items-center justify-center text-lg font-medium text-[var(--text-muted)]">
             {paciente.name ? paciente.name[0].toUpperCase() : '?'}
           </div>
           <div>
             <h1 className="text-lg font-medium">{paciente.name ?? 'Sem nome'}</h1>
-            <p className="text-sm text-gray-500">{paciente.phone}</p>
+            <p className="text-sm text-[var(--text-muted)]">{paciente.phone}</p>
           </div>
         </div>
-        <div className="border-t border-gray-100 pt-4">
-          <p className="text-xs text-gray-500">
+        <div className="border-t border-[var(--border-divider)] pt-4">
+          <p className="text-xs text-[var(--text-muted)]">
             Cadastrado em {new Date(paciente.created_at).toLocaleDateString('pt-BR')}
           </p>
         </div>
@@ -50,8 +50,8 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
 
       <PacienteNotes pacienteId={paciente.id} notasIniciais={paciente.notes} />
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
+      <div className="bg-[var(--surface-card)] border border-[var(--border-default)] rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-[var(--border-divider)]">
           <h2 className="text-sm font-medium">Histórico de consultas</h2>
         </div>
         {consultas && consultas.length > 0 ? (
@@ -63,7 +63,7 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
                     <p className="text-sm font-medium">
                       {(consulta.services as { name: string } | null)?.name ?? 'Consulta'}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--text-muted)]">
                       {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
                         day: '2-digit', month: '2-digit', year: 'numeric',
                         hour: '2-digit', minute: '2-digit',
@@ -77,7 +77,7 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
             ))}
           </div>
         ) : (
-          <p className="px-5 py-8 text-sm text-center text-gray-400">
+          <p className="px-5 py-8 text-sm text-center text-[var(--text-faint)]">
             Nenhuma consulta registrada.
           </p>
         )}

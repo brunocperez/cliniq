@@ -9,9 +9,9 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary: "bg-cliniq-600 text-white hover:bg-cliniq-700 border border-cliniq-600",
-  secondary: "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50",
-  ghost: "bg-transparent text-gray-500 border border-transparent hover:bg-gray-100 hover:text-gray-700",
-  danger: "bg-white text-red-600 border border-red-200 hover:bg-red-50",
+  secondary: "bg-[var(--surface-card)] text-[var(--text-body)] border border-[var(--border-default)] hover:bg-[var(--surface-app)]",
+  ghost: "bg-transparent text-[var(--text-muted)] border border-transparent hover:bg-[var(--surface-sunken)] hover:text-[var(--text-body)]",
+  danger: "bg-[var(--surface-card)] text-red-600 border border-red-200 hover:bg-red-50",
 };
 
 const sizes: Record<Size, string> = {

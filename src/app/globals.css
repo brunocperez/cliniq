@@ -6,86 +6,127 @@
   --color-cliniq-500: #1D9E75;
   --color-cliniq-400: #5DCAA5;
   --color-cliniq-200: #A7E2CC;
-  --color-cliniq-50: #E1F5EE;
+  --color-cliniq-50:  #E1F5EE;
 
   --color-confirmado-fill: #DCFCE7;
-  --color-confirmado-ink: #15803D;
-  --color-agendado-fill: #FEF9C3;
-  --color-agendado-ink: #A16207;
+  --color-confirmado-ink:  #15803D;
+  --color-agendado-fill:   #FEF9C3;
+  --color-agendado-ink:    #A16207;
 }
 
+/* ─── Light mode tokens ─────────────────────────────────────── */
 :root {
   /* Brand */
-  --brand: #0F6E56;
-  --brand-hover: #0a5a45;
-  --cliniq-600: #0F6E56;
-  --cliniq-500: #1D9E75;
-  --cliniq-50: #E1F5EE;
+  --brand:            #0F6E56;
+  --brand-hover:      #0B5443;
+  --brand-soft:       #E1F5EE;
+  --cliniq-700:       #0B5443;
+  --cliniq-600:       #0F6E56;
+  --cliniq-500:       #1D9E75;
+  --cliniq-400:       #5DCAA5;
+  --cliniq-200:       #A7E2CC;
+  --cliniq-50:        #E1F5EE;
 
   /* Surfaces */
-  --surface-app: #F9FAFB;
-  --surface-card: #FFFFFF;
+  --surface-app:      #F9FAFB;
+  --surface-card:     #FFFFFF;
+  --surface-sunken:   #F9FAFB;
 
   /* Text */
-  --text-strong: #111827;
-  --text-body: #374151;
-  --text-muted: #6B7280;
-  --text-faint: #9CA3AF;
-  --text-on-brand: #FFFFFF;
+  --text-strong:      #111827;
+  --text-body:        #374151;
+  --text-muted:       #6B7280;
+  --text-faint:       #9CA3AF;
+  --text-on-brand:    #FFFFFF;
 
   /* Borders */
-  --border-default: #E5E7EB;
-  --border-divider: #F3F4F6;
-  --border-focus: #9CA3AF;
+  --border-default:   #E5E7EB;
+  --border-divider:   #F3F4F6;
+  --border-strong:    #9CA3AF;
+  --border-focus:     #9CA3AF;
 
   /* Status — agendado */
-  --agendado-fill: #FFFBEB;
-  --agendado-ink: #92400E;
+  --agendado-fill:    #FEF9C3;
+  --agendado-ink:     #A16207;
 
   /* Status — confirmado */
-  --confirmado-fill: #EFF6FF;
-  --confirmado-ink: #1E40AF;
+  --confirmado-fill:  #DCFCE7;
+  --confirmado-ink:   #15803D;
 
   /* Status — realizado */
-  --realizado-fill: #ECFDF5;
-  --realizado-ink: #065F46;
+  --realizado-fill:   #DBEAFE;
+  --realizado-ink:    #1D4ED8;
 
   /* Status — faltou */
-  --faltou-fill: #FEF2F2;
-  --faltou-ink: #991B1B;
+  --faltou-fill:      #FEE2E2;
+  --faltou-ink:       #B91C1C;
 
   /* Status — cancelado */
-  --cancelado-fill: #F3F4F6;
-  --cancelado-ink: #4B5563;
+  --cancelado-fill:   #F3F4F6;
+  --cancelado-ink:    #6B7280;
 
   /* Danger */
-  --danger-50: #FEF2F2;
-  --danger-200: #FECACA;
-  --danger-600: #DC2626;
+  --danger-50:        #FEF2F2;
+  --danger-200:       #FECACA;
+  --danger-600:       #DC2626;
+
+  /* Chart */
+  --chart-violet:     #7F77DD;
 
   /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-pill: 9999px;
+  --radius-sm:        4px;
+  --radius-md:        8px;
+  --radius-lg:        12px;
+  --radius-pill:      9999px;
+
+  /* Shadows */
+  --shadow-xs:        0 1px 2px rgba(16,24,40,0.05);
+  --shadow-sm:        0 1px 3px rgba(16,24,40,0.08);
+  --shadow-md:        0 8px 24px rgba(16,24,40,0.12);
 
   /* Sidebar */
-  --sidebar-w: 224px;
+  --sidebar-w:           224px;
   --sidebar-w-collapsed: 64px;
 
   /* Typography */
-  --font-sans: var(--font-geist, system-ui, sans-serif);
-  --font-mono: var(--font-geist-mono, monospace);
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-2xl: 24px;
-  --weight-normal: 400;
-  --weight-medium: 500;
-  --weight-bold: 700;
-  --line-tight: 1.25;
+  --font-sans:        var(--font-geist, system-ui, sans-serif);
+  --font-mono:        var(--font-geist-mono, monospace);
+  --text-xs:          0.75rem;
+  --text-sm:          0.875rem;
+  --text-base:        1rem;
+  --text-lg:          1.125rem;
+  --text-xl:          1.25rem;
+  --text-2xl:         1.5rem;
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+  --tracking-tight:   -0.015em;
+  --line-tight:       1.2;
+  --line-snug:        1.35;
+  --line-normal:      1.5;
 
-  /* Misc */
-  --white: #FFFFFF;
+  --white:            #FFFFFF;
+}
+
+/* ─── Dark mode tokens ──────────────────────────────────────── */
+.dark {
+  --surface-app:      #0D1211;
+  --surface-card:     #161D1B;
+  --surface-sunken:   #1B211F;
+
+  --border-default:   #2A302E;
+  --border-divider:   #232927;
+  --border-strong:    #4B5563;
+
+  --text-strong:      #F4F6F5;
+  --text-body:        #D8DEDB;
+  --text-muted:       #93A099;
+  --text-faint:       #6B7570;
+
+  --cliniq-50:        #132A22;
+  --cliniq-200:       #1E4536;
+  --cliniq-700:       #7FD8B8;
+  --brand-soft:       #132A22;
+  --brand-hover:      #7FD8B8;
 }

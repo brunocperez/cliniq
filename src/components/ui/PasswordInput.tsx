@@ -36,7 +36,7 @@ export default function PasswordInput({ value, onChange, label, placeholder }: P
 
   return (
     <div>
-      {label && <label className="block text-xs text-gray-500 mb-1">{label}</label>}
+      {label && <label className="block text-xs text-[var(--text-muted)] mb-1">{label}</label>}
       <div className="flex items-center gap-2">
         <input
           type={mostrar ? 'text' : 'password'}
@@ -44,12 +44,12 @@ export default function PasswordInput({ value, onChange, label, placeholder }: P
           onChange={e => onChange(e.target.value)}
           onFocus={() => setTocado(true)}
           placeholder={placeholder ?? 'Mínimo 8 caracteres'}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          className="w-full border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
         />
         <button
           type="button"
           onClick={() => setMostrar(!mostrar)}
-          className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1 border border-gray-200 rounded-lg shrink-0"
+          className="text-xs text-[var(--text-faint)] hover:text-gray-600 px-2 py-1 border border-[var(--border-default)] rounded-lg shrink-0"
         >
           {mostrar ? 'Ocultar' : 'Ver'}
         </button>
@@ -59,7 +59,7 @@ export default function PasswordInput({ value, onChange, label, placeholder }: P
         <div className="mt-2 flex flex-col gap-1">
           {requisitos.map(r => (
             <div key={r.label} className="flex items-center gap-2">
-              <span className={`text-xs ${r.valido ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className={`text-xs ${r.valido ? 'text-green-600' : 'text-[var(--text-faint)]'}`}>
                 {r.valido ? '✓' : '○'} {r.label}
               </span>
             </div>

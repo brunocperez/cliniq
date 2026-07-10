@@ -141,7 +141,7 @@ export default async function DashboardPage() {
               <Link
                 key={consulta.id}
                 href={`/dashboard/agenda/${consulta.id}`}
-                className="px-5 py-3 flex items-center justify-between hover:bg-gray-50"
+                className="px-5 py-3 flex items-center justify-between hover:bg-[var(--surface-app)]"
                 style={{ display: 'flex' }}
               >
                 <div>

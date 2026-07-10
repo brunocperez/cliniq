@@ -24,7 +24,7 @@ export default function RetornoButton({ consultaId, pacienteId, tenantId }: Prop
       )}
       <button
         onClick={() => setMostrarModal(true)}
-        className="text-sm px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 w-full"
+        className="text-sm px-4 py-2 border border-[var(--border-default)] rounded-lg text-gray-600 hover:bg-[var(--surface-app)] w-full"
       >
         + Marcar retorno
       </button>

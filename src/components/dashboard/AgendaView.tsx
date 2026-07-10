@@ -138,11 +138,11 @@ export default function AgendaView({ consultas, servicos }: Props) {
 
   function renderLista() {
     if (consultasFiltradas.length === 0) {
-      return <p className="px-5 py-8 text-sm text-center text-gray-400">Nenhuma consulta encontrada.</p>
+      return <p className="px-5 py-8 text-sm text-center text-[var(--text-faint)]">Nenhuma consulta encontrada.</p>
     }
     return (
       <div>
-        <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 20px", background: "var(--surface-sunken)", borderBottom: "1px solid var(--border-divider)" }}>
           <input
             type="checkbox"
             checked={selecionados.length === consultasFiltradas.length && consultasFiltradas.length > 0}
@@ -151,7 +151,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
           />
           {selecionados.length > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">{selecionados.length} selecionado(s)</span>
+              <span className="text-xs text-[var(--text-muted)]">{selecionados.length} selecionado(s)</span>
               <Button variant="secondary" size="sm" onClick={handleArquivar} disabled={loadingAcao}>
                 {mostrarArquivados ? 'Desarquivar' : 'Arquivar'}
               </Button>
@@ -176,7 +176,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
                   <a href={`/dashboard/agenda/${consulta.id}`} className="text-sm font-medium hover:text-blue-600">
                     {consulta.patients?.name ?? 'Paciente'}
                   </a>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--text-muted)]">
                     {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
                       day: '2-digit', month: '2-digit', year: 'numeric',
                       hour: '2-digit', minute: '2-digit',
@@ -303,12 +303,12 @@ export default function AgendaView({ consultas, servicos }: Props) {
       <div className="flex flex-col gap-3 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+            <div style={{ display: "flex", gap: 4, background: "var(--surface-sunken)", borderRadius: "var(--radius-md)", padding: 4 }}>
               {(['lista', 'semanal', 'mensal'] as Visualizacao[]).map(v => (
                 <button
                   key={v}
                   onClick={() => setVisualizacao(v)}
-                  className={`text-xs px-3 py-1.5 rounded-md capitalize ${visualizacao === v ? 'bg-white text-gray-900 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                  className={`text-xs px-3 py-1.5 rounded-md capitalize ${visualizacao === v ? 'bg-[var(--surface-card)] text-[var(--text-strong)] font-medium shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-body)]'}`}
                 >
                   {v}
                 </button>
@@ -326,9 +326,9 @@ export default function AgendaView({ consultas, servicos }: Props) {
 
           {visualizacao !== 'lista' && (
             <div className="flex items-center gap-2">
-              <button onClick={() => navegar(-1)} className="text-sm px-2 py-1 border border-gray-200 rounded hover:bg-gray-50">←</button>
+              <button onClick={() => navegar(-1)} className="text-sm px-2 py-1 border border-[var(--border-default)] rounded hover:bg-[var(--surface-app)]">←</button>
               <span className="text-sm text-gray-600 min-w-48 text-center">{getTitulo()}</span>
-              <button onClick={() => navegar(1)} className="text-sm px-2 py-1 border border-gray-200 rounded hover:bg-gray-50">→</button>
+              <button onClick={() => navegar(1)} className="text-sm px-2 py-1 border border-[var(--border-default)] rounded hover:bg-[var(--surface-app)]">→</button>
             </div>
           )}
         </div>
@@ -339,12 +339,12 @@ export default function AgendaView({ consultas, servicos }: Props) {
             value={busca}
             onChange={e => setBusca(e.target.value)}
             placeholder="Buscar paciente..."
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            className="flex-1 border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
           />
           <select
             value={filtroStatus}
             onChange={e => setFiltroStatus(e.target.value as Filtro)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            className="border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
           >
             <option value="todos">Todos os status</option>
             <option value="agendado">Agendado</option>
@@ -356,7 +356,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
           <select
             value={filtroServico}
             onChange={e => setFiltroServico(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+            className="border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
           >
             <option value="">Todos os serviços</option>
             {servicos.map(s => (
@@ -367,27 +367,27 @@ export default function AgendaView({ consultas, servicos }: Props) {
 
         <div className="flex gap-2">
           <div className="flex items-center gap-2 flex-1">
-            <label className="text-xs text-gray-500 shrink-0">De</label>
+            <label className="text-xs text-[var(--text-muted)] shrink-0">De</label>
             <input
               type="date"
               value={filtroDataInicio}
               onChange={e => setFiltroDataInicio(e.target.value)}
-              className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+              className="flex-1 border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
             />
           </div>
           <div className="flex items-center gap-2 flex-1">
-            <label className="text-xs text-gray-500 shrink-0">Até</label>
+            <label className="text-xs text-[var(--text-muted)] shrink-0">Até</label>
             <input
               type="date"
               value={filtroDataFim}
               onChange={e => setFiltroDataFim(e.target.value)}
-              className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+              className="flex-1 border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
             />
           </div>
           {(filtroDataInicio || filtroDataFim || filtroStatus !== 'todos' || filtroServico || busca) && (
             <button
               onClick={() => { setFiltroDataInicio(''); setFiltroDataFim(''); setFiltroStatus('todos'); setFiltroServico(''); setBusca('') }}
-              className="text-xs px-3 py-2 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50"
+              className="text-xs px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-app)]"
             >
               Limpar
             </button>
@@ -395,7 +395,7 @@ export default function AgendaView({ consultas, servicos }: Props) {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div style={{ background: "var(--surface-card)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-lg)", overflow: "hidden" }}>
         {visualizacao === 'lista' && renderLista()}
         {visualizacao === 'semanal' && renderSemanal()}
         {visualizacao === 'mensal' && renderMensal()}

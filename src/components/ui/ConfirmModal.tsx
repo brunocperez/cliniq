@@ -14,14 +14,14 @@ export default function ConfirmModal({ mensagem, onConfirmar, onCancelar }: Prop
       onClick={onCancelar}
     >
       <div
-        className="bg-white rounded-xl border border-gray-200 p-6 w-full max-w-sm mx-4"
+        className="bg-[var(--surface-card)] rounded-xl border border-[var(--border-default)] p-6 w-full max-w-sm mx-4"
         onClick={e => e.stopPropagation()}
       >
-        <p className="text-sm text-gray-700 mb-6 text-center">{mensagem}</p>
+        <p className="text-sm text-[var(--text-body)] mb-6 text-center">{mensagem}</p>
         <div className="flex gap-3">
           <button
             onClick={onCancelar}
-            className="flex-1 text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50"
+            className="flex-1 text-sm px-4 py-2 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:bg-[var(--surface-app)]"
           >
             Cancelar
           </button>

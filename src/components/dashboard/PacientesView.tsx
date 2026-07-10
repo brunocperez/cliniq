@@ -90,7 +90,7 @@ export default function PacientesView({ pacientes }: Props) {
           value={busca}
           onChange={e => setBusca(e.target.value)}
           placeholder="Buscar por nome ou telefone..."
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
+          className="flex-1 border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
           style={{ fontFamily: 'var(--font-sans)' }}
         />
         <Button
