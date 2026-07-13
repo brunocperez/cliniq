@@ -6,32 +6,13 @@ import Link from 'next/link'
 import PhoneInput from '@/components/ui/PhoneInput'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
+import { inputStyle, labelStyle } from '@/lib/styles'
 
 const especialidades = [
   'Odontologia', 'Psicologia', 'Fisioterapia', 'Nutrição', 'Fonoaudiologia',
   'Dermatologia', 'Cardiologia', 'Ortopedia', 'Ginecologia', 'Pediatria',
   'Clínica Geral', 'Outra',
 ]
-
-const inputStyle = {
-  width: '100%',
-  border: '1px solid var(--border-default)',
-  borderRadius: 'var(--radius-md)',
-  padding: '8px 12px',
-  fontSize: 'var(--text-sm)',
-  fontFamily: 'var(--font-sans)',
-  outline: 'none',
-  boxSizing: 'border-box' as const,
-  color: 'var(--text-body)',
-  background: 'var(--surface-card)',
-}
-
-const labelStyle = {
-  display: 'block',
-  fontSize: 'var(--text-xs)',
-  color: 'var(--text-muted)',
-  marginBottom: 4,
-}
 
 export default function NovoTenantPage() {
   const router = useRouter()

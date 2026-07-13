@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
+import { inputStyle, labelStyle } from '@/lib/styles'
 
 type Role = 'clinica' | 'admin'
 
@@ -47,20 +48,7 @@ export default function LoginPage() {
     }
   }
 
-  const inputStyle = {
-    width: '100%',
-    border: '1px solid var(--border-default)',
-    borderRadius: 'var(--radius-md)',
-    padding: '8px 12px',
-    fontSize: 'var(--text-sm)',
-    fontFamily: 'var(--font-sans)',
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-    color: 'var(--text-body)',
-    background: 'var(--surface-card)',
-  }
-
-  const segmentos: { value: Role; label: string }[] = [
+    const segmentos: { value: Role; label: string }[] = [
     { value: 'clinica', label: 'Sou uma clínica' },
     { value: 'admin', label: 'Sou administrador' },
   ]

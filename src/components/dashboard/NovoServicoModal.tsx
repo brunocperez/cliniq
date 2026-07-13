@@ -5,26 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
-
-const inputStyle = {
-  width: '100%',
-  border: '1px solid var(--border-default)',
-  borderRadius: 'var(--radius-md)',
-  padding: '8px 12px',
-  fontSize: 'var(--text-sm)',
-  fontFamily: 'var(--font-sans)',
-  outline: 'none',
-  boxSizing: 'border-box' as const,
-  color: 'var(--text-body)',
-  background: 'var(--surface-card)',
-}
-
-const labelStyle = {
-  display: 'block',
-  fontSize: 'var(--text-xs)',
-  color: 'var(--text-muted)',
-  marginBottom: 4,
-}
+import { inputStyle, labelStyle } from '@/lib/styles'
 
 interface Props {
   onFechar: () => void

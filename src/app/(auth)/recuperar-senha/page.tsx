@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
+import { inputStyle, labelStyle } from '@/lib/styles'
 
 export default function RecuperarSenhaPage() {
   const supabase = createClient()
@@ -31,20 +32,7 @@ export default function RecuperarSenhaPage() {
     setLoading(false)
   }
 
-  const inputStyle = {
-    width: '100%',
-    border: '1px solid var(--border-default)',
-    borderRadius: 'var(--radius-md)',
-    padding: '8px 12px',
-    fontSize: 'var(--text-sm)',
-    fontFamily: 'var(--font-sans)',
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-    color: 'var(--text-body)',
-    background: 'var(--surface-card)',
-  }
-
-  return (
+    return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-app)' }}>
       <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 32, width: '100%', maxWidth: 380 }}>
         <div style={{ marginBottom: 24 }}>

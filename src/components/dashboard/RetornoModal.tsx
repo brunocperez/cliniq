@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
+import { inputStyle, labelStyle } from '@/lib/styles'
 
 interface Servico {
   id: string
@@ -133,20 +134,7 @@ export default function RetornoModal({ consultaId, pacienteId, tenantId, onFecha
     router.refresh()
   }
 
-  const inputStyle = {
-    width: '100%',
-    border: '1px solid var(--border-default)',
-    borderRadius: 'var(--radius-md)',
-    padding: '8px 12px',
-    fontSize: 'var(--text-sm)',
-    fontFamily: 'var(--font-sans)',
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-    color: 'var(--text-body)',
-    background: 'var(--surface-card)',
-  }
-
-  return (
+    return (
     <div
       style={{ background: 'rgba(0,0,0,0.4)', position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 16 }}
       onClick={onFechar}
