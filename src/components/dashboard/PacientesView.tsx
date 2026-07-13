@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import Button from '@/components/ui/Button'
+import NovoPacienteModal from '@/components/dashboard/NovoPacienteModal'
 
 interface Paciente {
   id: string
@@ -24,6 +25,7 @@ export default function PacientesView({ pacientes }: Props) {
   const [selecionados, setSelecionados] = useState<string[]>([])
   const [loadingAcao, setLoadingAcao] = useState(false)
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false)
+  const [mostrarModalNovo, setMostrarModalNovo] = useState(false)
   const [busca, setBusca] = useState('')
 
   const pacientesFiltrados = pacientes.filter(p => {
@@ -84,27 +86,43 @@ export default function PacientesView({ pacientes }: Props) {
         />
       )}
 
-      <div className="flex gap-2 mb-4">
+      {mostrarModalNovo && (
+        <NovoPacienteModal onFechar={() => setMostrarModalNovo(false)} />
+      )}
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
         <input
           type="text"
           value={busca}
           onChange={e => setBusca(e.target.value)}
           placeholder="Buscar por nome ou telefone..."
-          className="flex-1 border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400"
-          style={{ fontFamily: 'var(--font-sans)' }}
+          style={{
+            flex: 1,
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-md)',
+            padding: '8px 12px',
+            fontSize: 'var(--text-sm)',
+            fontFamily: 'var(--font-sans)',
+            outline: 'none',
+            color: 'var(--text-body)',
+            background: 'var(--surface-card)',
+          }}
         />
         <Button
           variant="secondary"
           size="sm"
           onClick={() => { setMostrarArquivados(!mostrarArquivados); setSelecionados([]) }}
-          style={mostrarArquivados ? { background: '#F3F4F6', borderColor: '#111827', color: '#111827' } : {}}
+          style={mostrarArquivados ? { background: 'var(--surface-sunken)', borderColor: 'var(--text-strong)', color: 'var(--text-strong)' } : {}}
         >
           {mostrarArquivados ? 'Ver ativos' : 'Ver arquivados'}
+        </Button>
+        <Button size="sm" onClick={() => setMostrarModalNovo(true)}>
+          + Novo paciente
         </Button>
       </div>
 
       <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--surface-app)', borderBottom: '1px solid var(--border-divider)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--surface-sunken)', borderBottom: '1px solid var(--border-divider)' }}>
           <input
             type="checkbox"
             checked={selecionados.length === pacientesFiltrados.length && pacientesFiltrados.length > 0}
@@ -125,10 +143,9 @@ export default function PacientesView({ pacientes }: Props) {
             <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>Nome</span>
           )}
         </div>
-
         <table className="w-full text-sm">
           <thead>
-            <tr style={{ background: 'var(--surface-app)', borderBottom: '1px solid var(--border-default)' }}>
+            <tr style={{ background: 'var(--surface-sunken)', borderBottom: '1px solid var(--border-default)' }}>
               <th className="w-10 px-4 py-3"></th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--text-sm)' }}>Nome</th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)', fontSize: 'var(--text-sm)' }}>WhatsApp</th>

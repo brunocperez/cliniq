@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Trash2 } from 'lucide-react'
 import ConfirmModal from '@/components/ui/ConfirmModal'
+import NovoServicoModal from '@/components/dashboard/NovoServicoModal'
+import Button from '@/components/ui/Button'
 
 interface Servico {
   id: string
@@ -21,6 +23,7 @@ export default function ServicosView({ servicos }: Props) {
   const router = useRouter()
   const [excluindoId, setExcluindoId] = useState<string | null>(null)
   const [loadingAcao, setLoadingAcao] = useState(false)
+  const [mostrarModalNovo, setMostrarModalNovo] = useState(false)
 
   async function handleExcluir() {
     if (!excluindoId) return
@@ -45,10 +48,20 @@ export default function ServicosView({ servicos }: Props) {
         />
       )}
 
+      {mostrarModalNovo && (
+        <NovoServicoModal onFechar={() => setMostrarModalNovo(false)} />
+      )}
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+        <Button size="sm" onClick={() => setMostrarModalNovo(true)}>
+          + Novo serviço
+        </Button>
+      </div>
+
       <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         <table className="w-full text-sm">
           <thead>
-            <tr style={{ background: 'var(--surface-app)', borderBottom: '1px solid var(--border-default)' }}>
+            <tr style={{ background: 'var(--surface-sunken)', borderBottom: '1px solid var(--border-default)' }}>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Nome</th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Duração</th>
               <th className="text-left px-4 py-3" style={{ color: 'var(--text-muted)', fontWeight: 'var(--weight-medium)' }}>Valor</th>
