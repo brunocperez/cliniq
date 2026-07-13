@@ -7,6 +7,7 @@ import ConsultaActions from '@/components/dashboard/ConsultaActions'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import StatusBadge from '@/components/ui/StatusBadge'
 import Button from '@/components/ui/Button'
+import NovaConsultaModal from '@/components/dashboard/NovaConsultaModal'
 
 interface Paciente {
   name: string | null
@@ -64,6 +65,7 @@ export default function AgendaView({ consultas, servicos, comModal = false }: Pr
   const [selecionados, setSelecionados] = useState<string[]>([])
   const [loadingAcao, setLoadingAcao] = useState(false)
   const [mostrarModalExcluir, setMostrarModalExcluir] = useState(false)
+  const [mostrarModal, setMostrarModal] = useState(false)
 
   const consultasFiltradas = consultas.filter(c => {
     if (c.archived !== mostrarArquivados) return false
@@ -174,8 +176,7 @@ export default function AgendaView({ consultas, servicos, comModal = false }: Pr
               />
               <div className="flex-1 flex items-center justify-between">
                 <div>
-                  <a href={`/dashboard/agenda/${consulta.id}`} className="text-sm font-medium hover:text-blue-600">
-                    {consulta.patients?.name ?? 'Paciente'}
+                  <a href={`/dashboard/agenda/${consulta.id}`} className="text-sm font-medium" style={{ color: 'var(--text-strong)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--brand)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-strong)')}>                    {consulta.patients?.name ?? 'Paciente'}
                   </a>
                   <p className="text-xs text-[var(--text-muted)]">
                     {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
@@ -301,6 +302,8 @@ export default function AgendaView({ consultas, servicos, comModal = false }: Pr
         />
       )}
 
+{mostrarModal && <NovaConsultaModal onFechar={() => setMostrarModal(false)} />}
+
       <div className="flex flex-col gap-3 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -325,13 +328,18 @@ export default function AgendaView({ consultas, servicos, comModal = false }: Pr
             </Button>
           </div>
 
-          {visualizacao !== 'lista' && (
-            <div className="flex items-center gap-2">
-              <button onClick={() => navegar(-1)} className="text-sm px-2 py-1 border border-[var(--border-default)] rounded hover:bg-[var(--surface-app)]">←</button>
-              <span className="text-sm text-gray-600 min-w-48 text-center">{getTitulo()}</span>
-              <button onClick={() => navegar(1)} className="text-sm px-2 py-1 border border-[var(--border-default)] rounded hover:bg-[var(--surface-app)]">→</button>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {visualizacao !== 'lista' && (
+              <>
+                <button onClick={() => navegar(-1)} className="text-sm px-2 py-1 border border-[var(--border-default)] rounded hover:bg-[var(--surface-app)]">←</button>
+                <span className="text-sm text-[var(--text-muted)] min-w-48 text-center">{getTitulo()}</span>
+                <button onClick={() => navegar(1)} className="text-sm px-2 py-1 border border-[var(--border-default)] rounded hover:bg-[var(--surface-app)]">→</button>
+              </>
+            )}
+            {comModal && (
+              <Button size="sm" onClick={() => setMostrarModal(true)}>+ Nova consulta</Button>
+            )}
+          </div>
         </div>
 
         <div className="flex gap-2">
