@@ -139,6 +139,14 @@ export default function LoginPage() {
           {loading ? 'Entrando...' : 'Entrar'}
         </Button>
 
+        <div style={{ textAlign: 'right', marginTop: 8 }}>
+          <Link href="/recuperar-senha" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--brand)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+            Esqueci minha senha
+          </Link>
+        </div>
+
         {role === 'clinica' && (
           <p style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 16 }}>
             Ainda não tem conta?{' '}
