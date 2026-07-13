@@ -1,11 +1,6 @@
-import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import PacienteNotes from '@/components/dashboard/PacienteNotes'
-import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
-import StatusBadge from '@/components/ui/StatusBadge'
-
-type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
+import PacienteView from '@/components/dashboard/PacienteView'
 
 export default async function PacientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -26,62 +21,9 @@ export default async function PacientePage({ params }: { params: Promise<{ id: s
     .order('scheduled_at', { ascending: false })
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-6">
-        <Link href="/dashboard/pacientes" className="text-sm hover:opacity-70" style={{ color: '#0F6E56' }}>← Voltar</Link>
-      </div>
-
-      <div className="bg-[var(--surface-card)] border border-[var(--border-default)] rounded-xl p-6 mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-full bg-[var(--surface-sunken)] flex items-center justify-center text-lg font-medium text-[var(--text-muted)]">
-            {paciente.name ? paciente.name[0].toUpperCase() : '?'}
-          </div>
-          <div>
-            <h1 className="text-lg font-medium">{paciente.name ?? 'Sem nome'}</h1>
-            <p className="text-sm text-[var(--text-muted)]">{paciente.phone}</p>
-          </div>
-        </div>
-        <div className="border-t border-[var(--border-divider)] pt-4">
-          <p className="text-xs text-[var(--text-muted)]">
-            Cadastrado em {new Date(paciente.created_at).toLocaleDateString('pt-BR')}
-          </p>
-        </div>
-      </div>
-
-      <PacienteNotes pacienteId={paciente.id} notasIniciais={paciente.notes} />
-
-      <div className="bg-[var(--surface-card)] border border-[var(--border-default)] rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[var(--border-divider)]">
-          <h2 className="text-sm font-medium">Histórico de consultas</h2>
-        </div>
-        {consultas && consultas.length > 0 ? (
-          <div className="divide-y divide-gray-100">
-            {consultas.map((consulta) => (
-              <div key={consulta.id} className="px-5 py-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-sm font-medium">
-                      {(consulta.services as { name: string } | null)?.name ?? 'Consulta'}
-                    </p>
-                    <p className="text-xs text-[var(--text-muted)]">
-                      {new Date(consulta.scheduled_at).toLocaleString('pt-BR', {
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
-                  <StatusBadge status={consulta.status as Status} />
-                </div>
-                <ConsultaNotes consultaId={consulta.id} notasIniciais={consulta.notes} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="px-5 py-8 text-sm text-center text-[var(--text-faint)]">
-            Nenhuma consulta registrada.
-          </p>
-        )}
-      </div>
-    </div>
+    <PacienteView
+      paciente={paciente}
+      consultas={consultas ?? []}
+    />
   )
 }
