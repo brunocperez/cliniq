@@ -62,7 +62,7 @@ export default async function DashboardPage() {
     <div>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>
-          Olá, {profile?.full_name} 👋
+          Olá, {profile?.full_name}!
         </h1>
         <p style={{ margin: '2px 0 0', fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
           Aqui está o resumo do seu consultório
@@ -141,7 +141,7 @@ export default async function DashboardPage() {
               <Link
                 key={consulta.id}
                 href={`/dashboard/agenda/${consulta.id}`}
-                className="px-5 py-3 flex items-center justify-between hover:bg-[var(--surface-app)]"
+                className="px-5 py-3 flex items-center justify-between hover:bg-(--surface-app)"
                 style={{ display: 'flex' }}
               >
                 <div>
