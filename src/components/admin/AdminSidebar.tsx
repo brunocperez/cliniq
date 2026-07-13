@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Users } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Users, BarChart2 } from 'lucide-react'
 import AdminNavLink from '@/components/admin/NavLink'
 import LogoutButton from '@/components/admin/LogoutButton'
 
@@ -39,7 +39,10 @@ export default function AdminSidebar() {
 
       <nav className="flex flex-col gap-1 p-2 flex-1">
         <AdminNavLink href="/admin" icon={<Users size={18} />} expandido={expandido} exact>
-          Tenants
+          Clínicas
+        </AdminNavLink>
+        <AdminNavLink href="/admin/metricas" icon={<BarChart2 size={18} />} expandido={expandido}>
+          Métricas
         </AdminNavLink>
       </nav>
 
