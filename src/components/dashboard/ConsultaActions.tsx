@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -18,14 +19,16 @@ const acoes = [
 export default function ConsultaActions({ consultaId, statusAtual }: Props) {
   const router = useRouter()
   const supabase = createClient()
+  const [loading, setLoading] = useState<string | null>(null)
 
   async function handleStatus(novoStatus: string) {
+    setLoading(novoStatus)
     await supabase
       .from('appointments')
       .update({ status: novoStatus })
       .eq('id', consultaId)
-
     router.refresh()
+    setLoading(null)
   }
 
   if (statusAtual === 'realizado' || statusAtual === 'cancelado') {
@@ -36,10 +39,12 @@ export default function ConsultaActions({ consultaId, statusAtual }: Props) {
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
       {acoes.map(acao => {
         if (acao.somente && !acao.somente.includes(statusAtual)) return null
+        const isLoading = loading === acao.status
         return (
           <button
             key={acao.status}
             onClick={() => handleStatus(acao.status)}
+            disabled={loading !== null}
             style={{
               fontSize: 'var(--text-xs)',
               padding: '4px 12px',
@@ -47,13 +52,14 @@ export default function ConsultaActions({ consultaId, statusAtual }: Props) {
               border: `1px solid ${acao.ink}33`,
               background: acao.fill,
               color: acao.ink,
-              cursor: 'pointer',
+              cursor: loading !== null ? 'not-allowed' : 'pointer',
               fontFamily: 'var(--font-sans)',
+              opacity: loading !== null && !isLoading ? 0.4 : 1,
+              transition: 'opacity 120ms ease',
+              minWidth: 70,
             }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
           >
-            {acao.label}
+            {isLoading ? '...' : acao.label}
           </button>
         )
       })}

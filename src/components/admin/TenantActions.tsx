@@ -19,17 +19,19 @@ export default function TenantActions({ tenantId, isActive, userId, tenantName }
   const [mostrarModalBloqueio, setMostrarModalBloqueio] = useState(false)
   const [mostrarModalReset, setMostrarModalReset] = useState(false)
   const [loadingReset, setLoadingReset] = useState(false)
+  const [loadingBloqueio, setLoadingBloqueio] = useState(false)
   const [senhaReset, setSenhaReset] = useState('')
   const [mostrarSenhaReset, setMostrarSenhaReset] = useState(false)
   const [copiado, setCopiado] = useState(false)
 
   async function handleToggle() {
+    setLoadingBloqueio(true)
     await supabase
       .from('tenants')
       .update({ is_active: !isActive })
       .eq('id', tenantId)
-
     setMostrarModalBloqueio(false)
+    setLoadingBloqueio(false)
     router.refresh()
   }
 
@@ -130,6 +132,7 @@ export default function TenantActions({ tenantId, isActive, userId, tenantName }
       <div style={{ display: 'flex', gap: 8 }}>
         <button
           onClick={() => setMostrarModalBloqueio(true)}
+          disabled={loadingBloqueio}
           style={{
             fontSize: 'var(--text-xs)',
             padding: '4px 12px',
@@ -137,11 +140,12 @@ export default function TenantActions({ tenantId, isActive, userId, tenantName }
             border: `1px solid ${isActive ? 'var(--danger-200)' : '#BBF7D0'}`,
             background: isActive ? 'var(--danger-50)' : '#F0FDF4',
             color: isActive ? 'var(--danger-600)' : '#15803D',
-            cursor: 'pointer',
+            cursor: loadingBloqueio ? 'not-allowed' : 'pointer',
             fontFamily: 'var(--font-sans)',
+            opacity: loadingBloqueio ? 0.5 : 1,
           }}
         >
-          {isActive ? 'Bloquear' : 'Desbloquear'}
+          {loadingBloqueio ? '...' : isActive ? 'Bloquear' : 'Desbloquear'}
         </button>
         <Button size="sm" onClick={() => setMostrarModalReset(true)} disabled={loadingReset}>
           Resetar senha
