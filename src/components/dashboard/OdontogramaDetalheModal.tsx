@@ -24,6 +24,16 @@ export const STATUS_CONFIG: Record<StatusFace, { label: string; cor: string }> =
 
 export const FACES: Face[] = ['oclusal', 'mesial', 'distal', 'vestibular', 'lingual']
 
+export interface HistoricoItem {
+  id: string
+  dente: number
+  campo: 'status' | 'nota'
+  face: Face | null
+  valor_anterior: string | null
+  valor_novo: string | null
+  criado_em: string
+}
+
 interface Props {
   numero: number
   data: DenteData
@@ -35,6 +45,8 @@ interface Props {
   onLimparDente: () => void
   onSalvarNota: (nota: string) => void
   onFechar: () => void
+  historico: HistoricoItem[]
+  carregandoHistorico: boolean
 }
 
 // Diagrama quadrado do dente (mesmo design validado da primeira versão),
@@ -114,11 +126,23 @@ function DenteQuadradoGrande({
   )
 }
 
+const FACE_LABEL_HIST: Record<Face, string> = {
+  oclusal: 'Oclusal', mesial: 'Mesial', distal: 'Distal', vestibular: 'Vestibular', lingual: 'Lingual',
+}
+
+function formatarValorHistorico(campo: 'status' | 'nota', valor: string | null): string {
+  if (valor === null) return '—'
+  if (campo === 'status') return STATUS_CONFIG[valor as StatusFace]?.label ?? valor
+  return valor.length > 40 ? valor.slice(0, 40) + '…' : valor
+}
+
 export default function OdontogramaDetalheModal({
   numero, data, faceSelecionada, salvando,
   onSelecionarFace, onSelecionarStatus, onLimparFace, onLimparDente, onSalvarNota, onFechar,
+  historico, carregandoHistorico,
 }: Props) {
   const [notaDraft, setNotaDraft] = useState(data.nota ?? '')
+  const [historicoAberto, setHistoricoAberto] = useState(false)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -279,6 +303,44 @@ export default function OdontogramaDetalheModal({
               </button>
             )}
           </div>
+        </div>
+
+        {/* Histórico de alterações */}
+        <div style={{ padding: '16px 20px 20px', borderTop: '1px solid var(--border-divider)' }}>
+          <button
+            onClick={() => setHistoricoAberto(v => !v)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <span style={{ transform: historicoAberto ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 120ms ease', fontSize: 10, color: 'var(--text-muted)' }}>▶</span>
+            Histórico {historico.length > 0 && `(${historico.length})`}
+          </button>
+          {historicoAberto && (
+            carregandoHistorico ? (
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 8 }}>Carregando...</p>
+            ) : historico.length === 0 ? (
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 8 }}>Nenhuma alteração registrada ainda</p>
+            ) : (
+              <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 220, overflowY: 'auto' }}>
+                {historico.map(item => (
+                  <div key={item.id} style={{ fontSize: 'var(--text-xs)', borderLeft: '2px solid var(--border-default)', paddingLeft: 8 }}>
+                    <div style={{ color: 'var(--text-strong)' }}>
+                      {item.campo === 'nota' ? 'Nota' : FACE_LABEL_HIST[item.face as Face]}
+                      {': '}
+                      {formatarValorHistorico(item.campo, item.valor_anterior)} → {formatarValorHistorico(item.campo, item.valor_novo)}
+                    </div>
+                    <div style={{ color: 'var(--text-muted)' }}>
+                      {new Date(item.criado_em).toLocaleString('pt-BR')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
         </div>
       </div>
     </div>

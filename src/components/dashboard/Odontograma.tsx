@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import OdontogramaDetalheModal, {
-  STATUS_CONFIG, type DenteData, type Face, type StatusFace,
+  STATUS_CONFIG, FACES, type DenteData, type Face, type StatusFace, type HistoricoItem,
 } from './OdontogramaDetalheModal'
 
 export type { DenteData }
@@ -88,7 +88,7 @@ const SEVERIDADE_COR: Record<Exclude<Severidade, null>, string> = {
 }
 
 function calcularSeveridade(data: DenteData): Severidade {
-  const statuses = Object.values(data)
+  const statuses = FACES.map(f => data[f]).filter(Boolean) as StatusFace[]
   if (statuses.includes('cariado')) return 'vermelho'
   if (statuses.includes('canal')) return 'amarelo'
   if (statuses.includes('restaurado') || statuses.includes('implante')) return 'verde'
@@ -104,9 +104,12 @@ const FACE_LABEL: Record<Face, string> = {
 }
 
 function resumoFaces(data: DenteData): { face: string; label: string; cor: string }[] {
-  return (Object.entries(data) as [Face, StatusFace][])
-    .filter(([, status]) => !!status)
-    .map(([face, status]) => ({ face: FACE_LABEL[face], label: STATUS_CONFIG[status].label, cor: STATUS_CONFIG[status].cor }))
+  return FACES
+    .filter(face => !!data[face])
+    .map(face => {
+      const status = data[face] as StatusFace
+      return { face: FACE_LABEL[face], label: STATUS_CONFIG[status].label, cor: STATUS_CONFIG[status].cor }
+    })
 }
 
 export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
@@ -115,6 +118,8 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
   const [faceSelecionada, setFaceSelecionada] = useState<Face | null>('oclusal')
   const [salvando, setSalvando] = useState(false)
   const [denteHover, setDenteHover] = useState<number | null>(null)
+  const [historico, setHistorico] = useState<HistoricoItem[]>([])
+  const [carregandoHistorico, setCarregandoHistorico] = useState(false)
 
   function handleAbrirDente(numero: number) {
     setDenteAberto(numero)
@@ -126,6 +131,26 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
     setFaceSelecionada(null)
   }
 
+  useEffect(() => {
+    if (!denteAberto) return
+    let cancelado = false
+    async function carregar() {
+      setCarregandoHistorico(true)
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('odontograma_historico')
+        .select('*')
+        .eq('patient_id', pacienteId)
+        .eq('dente', denteAberto)
+        .order('criado_em', { ascending: false })
+        .limit(20)
+      if (!cancelado && !error && data) setHistorico(data as HistoricoItem[])
+      if (!cancelado) setCarregandoHistorico(false)
+    }
+    carregar()
+    return () => { cancelado = true }
+  }, [denteAberto, pacienteId])
+
   async function salvar(novoOdontograma: Record<string, DenteData>) {
     setOdontograma(novoOdontograma)
     setSalvando(true)
@@ -134,17 +159,38 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
     setSalvando(false)
   }
 
+  async function registrarHistorico(
+    dente: number,
+    campo: 'status' | 'nota',
+    face: Face | null,
+    valorAnterior: string | null,
+    valorNovo: string | null,
+  ) {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('odontograma_historico')
+      .insert({ patient_id: pacienteId, dente, campo, face, valor_anterior: valorAnterior, valor_novo: valorNovo })
+      .select()
+      .single()
+    if (!error && data && dente === denteAberto) {
+      setHistorico(prev => [data as HistoricoItem, ...prev])
+    }
+  }
+
   async function handleSelecionarStatus(status: StatusFace) {
     if (!denteAberto || !faceSelecionada) return
+    const valorAnterior = odontograma[denteAberto]?.[faceSelecionada] ?? null
     const novoOdontograma = {
       ...odontograma,
       [denteAberto]: { ...odontograma[denteAberto], [faceSelecionada]: status },
     }
     await salvar(novoOdontograma)
+    await registrarHistorico(denteAberto, 'status', faceSelecionada, valorAnterior, status)
   }
 
   async function handleLimparFace() {
     if (!denteAberto || !faceSelecionada) return
+    const valorAnterior = odontograma[denteAberto]?.[faceSelecionada] ?? null
     const novoOdontograma = { ...odontograma }
     if (novoOdontograma[denteAberto]) {
       const novoDente = { ...novoOdontograma[denteAberto] }
@@ -153,17 +199,25 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
       else novoOdontograma[denteAberto] = novoDente
     }
     await salvar(novoOdontograma)
+    if (valorAnterior) await registrarHistorico(denteAberto, 'status', faceSelecionada, valorAnterior, null)
   }
 
   async function handleLimparDente() {
     if (!denteAberto) return
+    const denteAntes = odontograma[denteAberto] ?? {}
     const novoOdontograma = { ...odontograma }
     delete novoOdontograma[denteAberto]
     await salvar(novoOdontograma)
+    for (const face of FACES) {
+      const valorAnterior = denteAntes[face]
+      if (valorAnterior) await registrarHistorico(denteAberto, 'status', face, valorAnterior, null)
+    }
+    if (denteAntes.nota) await registrarHistorico(denteAberto, 'nota', null, denteAntes.nota, null)
   }
 
   async function handleSalvarNota(nota: string) {
     if (!denteAberto) return
+    const valorAnterior = odontograma[denteAberto]?.nota ?? null
     const novoOdontograma = { ...odontograma }
     const denteAtual = { ...(novoOdontograma[denteAberto] ?? {}) }
     if (nota.trim()) {
@@ -174,6 +228,7 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
     if (Object.keys(denteAtual).length === 0) delete novoOdontograma[denteAberto]
     else novoOdontograma[denteAberto] = denteAtual
     await salvar(novoOdontograma)
+    await registrarHistorico(denteAberto, 'nota', null, valorAnterior, nota.trim() ? nota : null)
   }
 
   const dataDenteAberto = denteAberto ? (odontograma[denteAberto] ?? {}) : {}
@@ -305,6 +360,8 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
           onLimparDente={handleLimparDente}
           onSalvarNota={handleSalvarNota}
           onFechar={handleFecharModal}
+          historico={historico}
+          carregandoHistorico={carregandoHistorico}
         />
       )}
 
