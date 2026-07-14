@@ -162,7 +162,27 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
     await salvar(novoOdontograma)
   }
 
+  async function handleSalvarNota(nota: string) {
+    if (!denteAberto) return
+    const novoOdontograma = { ...odontograma }
+    const denteAtual = { ...(novoOdontograma[denteAberto] ?? {}) }
+    if (nota.trim()) {
+      denteAtual.nota = nota
+    } else {
+      delete denteAtual.nota
+    }
+    if (Object.keys(denteAtual).length === 0) delete novoOdontograma[denteAberto]
+    else novoOdontograma[denteAberto] = denteAtual
+    await salvar(novoOdontograma)
+  }
+
   const dataDenteAberto = denteAberto ? (odontograma[denteAberto] ?? {}) : {}
+
+  const contagem = { vermelho: 0, amarelo: 0, verde: 0 }
+  for (const t of TOOTH_SHAPES) {
+    const sev = calcularSeveridade(odontograma[t.numero] ?? {})
+    if (sev) contagem[sev]++
+  }
 
   return (
     <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
@@ -174,16 +194,18 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
         </p>
       </div>
 
-      {/* Legenda de severidade */}
-      <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border-divider)', display: 'flex', flexWrap: 'wrap', gap: 14 }}>
+      {/* Legenda de severidade + contador */}
+      <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border-divider)', display: 'flex', flexWrap: 'wrap', gap: 16 }}>
         {[
-          { cor: SEVERIDADE_COR.vermelho, label: 'Problema pendente' },
-          { cor: SEVERIDADE_COR.amarelo, label: 'Em acompanhamento' },
-          { cor: SEVERIDADE_COR.verde, label: 'Tratamento concluído' },
+          { cor: SEVERIDADE_COR.vermelho, label: 'Problema pendente', qtd: contagem.vermelho },
+          { cor: SEVERIDADE_COR.amarelo, label: 'Em acompanhamento', qtd: contagem.amarelo },
+          { cor: SEVERIDADE_COR.verde, label: 'Tratamento concluído', qtd: contagem.verde },
         ].map(item => (
-          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 12, height: 12, borderRadius: '50%', background: item.cor }} />
-            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{item.label}</span>
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: item.cor, flexShrink: 0 }} />
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+              <strong style={{ color: 'var(--text-strong)', fontWeight: 600 }}>{item.qtd}</strong> {item.label}
+            </span>
           </div>
         ))}
       </div>
@@ -259,6 +281,11 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
                   </div>
                 )}
                 <p style={{ margin: '6px 0 0', fontSize: 10, color: 'var(--text-faint, #9ca3af)' }}>Clique para editar</p>
+                {data.nota && (
+                  <p style={{ margin: '6px 0 0', fontSize: 11, color: 'var(--text-strong)', fontStyle: 'italic', borderTop: '1px solid var(--border-divider)', paddingTop: 6 }}>
+                    “{data.nota}”
+                  </p>
+                )}
               </div>
             )
           })()}
@@ -267,6 +294,7 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
 
       {denteAberto && (
         <OdontogramaDetalheModal
+          key={denteAberto}
           numero={denteAberto}
           data={dataDenteAberto}
           faceSelecionada={faceSelecionada}
@@ -275,6 +303,7 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
           onSelecionarStatus={handleSelecionarStatus}
           onLimparFace={handleLimparFace}
           onLimparDente={handleLimparDente}
+          onSalvarNota={handleSalvarNota}
           onFechar={handleFecharModal}
         />
       )}

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export type StatusFace = 'higido' | 'cariado' | 'restaurado' | 'ausente' | 'implante' | 'canal'
 export type Face = 'oclusal' | 'mesial' | 'distal' | 'vestibular' | 'lingual'
@@ -10,6 +10,7 @@ export interface DenteData {
   distal?: StatusFace
   vestibular?: StatusFace
   lingual?: StatusFace
+  nota?: string
 }
 
 export const STATUS_CONFIG: Record<StatusFace, { label: string; cor: string }> = {
@@ -32,6 +33,7 @@ interface Props {
   onSelecionarStatus: (status: StatusFace) => void
   onLimparFace: () => void
   onLimparDente: () => void
+  onSalvarNota: (nota: string) => void
   onFechar: () => void
 }
 
@@ -114,8 +116,10 @@ function DenteQuadradoGrande({
 
 export default function OdontogramaDetalheModal({
   numero, data, faceSelecionada, salvando,
-  onSelecionarFace, onSelecionarStatus, onLimparFace, onLimparDente, onFechar,
+  onSelecionarFace, onSelecionarStatus, onLimparFace, onLimparDente, onSalvarNota, onFechar,
 }: Props) {
+  const [notaDraft, setNotaDraft] = useState(data.nota ?? '')
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onFechar()
@@ -153,6 +157,48 @@ export default function OdontogramaDetalheModal({
           <p style={{ textAlign: 'center', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', margin: '8px 0 0' }}>
             Clique em uma face do desenho, ou use os botões abaixo
           </p>
+        </div>
+
+        {/* Nota geral do dente */}
+        <div style={{ padding: '0 20px 16px' }}>
+          <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4 }}>
+            Nota do dente
+          </label>
+          <textarea
+            value={notaDraft}
+            onChange={e => setNotaDraft(e.target.value)}
+            placeholder="Ex: cárie profunda, avaliar necessidade de canal"
+            rows={2}
+            style={{
+              width: '100%',
+              fontSize: 'var(--text-xs)',
+              padding: '8px 10px',
+              borderRadius: 'var(--radius-md, 6px)',
+              border: '1px solid var(--border-default)',
+              fontFamily: 'var(--font-sans)',
+              resize: 'vertical',
+              color: 'var(--text-strong)',
+              background: 'var(--surface-card)',
+            }}
+          />
+          {notaDraft !== (data.nota ?? '') && (
+            <button
+              onClick={() => onSalvarNota(notaDraft)}
+              style={{
+                marginTop: 6,
+                fontSize: 'var(--text-xs)',
+                padding: '4px 12px',
+                borderRadius: 'var(--radius-pill)',
+                border: '1px solid var(--brand)',
+                background: 'var(--brand)',
+                color: 'white',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-sans)',
+              }}
+            >
+              Salvar nota
+            </button>
+          )}
         </div>
 
         {/* Seletor de face */}
