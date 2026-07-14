@@ -6,9 +6,10 @@ import StatusBadge from '@/components/ui/StatusBadge'
 import PacienteNotes from '@/components/dashboard/PacienteNotes'
 import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
 import Odontograma from '@/components/dashboard/Odontograma'
+import PlanoTratamento from '@/components/dashboard/PlanoTratamento'
 
 type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
-type Aba = 'resumo' | 'odontograma' | 'historico'
+type Aba = 'resumo' | 'odontograma' | 'plano'| 'historico'
 
 interface Consulta {
   id: string
@@ -17,6 +18,7 @@ interface Consulta {
   notes: string | null
   procedimento_realizado: string | null
   dente_tratado: string | null
+  dentes_tratados: number[] | null
   evolucao: string | null
   proximo_passo: string | null
   services: { name: string } | null
@@ -58,6 +60,7 @@ export default function PacienteView({ paciente, consultas }: Props) {
   const abas: { value: Aba; label: string }[] = [
     { value: 'resumo', label: 'Resumo' },
     { value: 'odontograma', label: 'Odontograma' },
+    { value: 'plano', label: 'Plano de Tratamento' },
     { value: 'historico', label: `Histórico (${consultas.length})` },
   ]
 
@@ -168,7 +171,7 @@ export default function PacienteView({ paciente, consultas }: Props) {
                   {consultasRealizadas[0].services && ` · ${(consultasRealizadas[0].services as { name: string }).name}`}
                 </p>
                 <CampoResultado label="Procedimento" valor={consultasRealizadas[0].procedimento_realizado} />
-                <CampoResultado label="Dente(s)" valor={consultasRealizadas[0].dente_tratado} />
+                <CampoResultado label="Dente(s)" valor={consultasRealizadas[0].dentes_tratados?.join(', ') || consultasRealizadas[0].dente_tratado} />
                 <CampoResultado label="Evolução" valor={consultasRealizadas[0].evolucao} />
                 <CampoResultado label="Próximo passo" valor={consultasRealizadas[0].proximo_passo} />
                 {!consultasRealizadas[0].procedimento_realizado && !consultasRealizadas[0].evolucao && (
@@ -184,6 +187,10 @@ export default function PacienteView({ paciente, consultas }: Props) {
         <Odontograma
             pacienteId={paciente.id}
                 odontogramaInicial={(paciente.odontograma as unknown as Record<string, import('@/components/dashboard/Odontograma').DenteData>) ?? {}}        />
+      )}
+
+      {aba === 'plano' && (
+        <PlanoTratamento pacienteId={paciente.id} />
       )}
 
       {/* Aba Histórico */}
@@ -212,7 +219,7 @@ export default function PacienteView({ paciente, consultas }: Props) {
                   {(consulta.procedimento_realizado || consulta.dente_tratado || consulta.evolucao || consulta.proximo_passo) && (
                     <div style={{ background: 'var(--surface-sunken)', borderRadius: 'var(--radius-md)', padding: '10px 14px', marginBottom: 10 }}>
                       <CampoResultado label="Procedimento" valor={consulta.procedimento_realizado} />
-                      <CampoResultado label="Dente(s)" valor={consulta.dente_tratado} />
+                      <CampoResultado label="Dente(s)" valor={consulta.dentes_tratados?.join(', ') || consulta.dente_tratado} />
                       <CampoResultado label="Evolução" valor={consulta.evolucao} />
                       <CampoResultado label="Próximo passo" valor={consulta.proximo_passo} />
                     </div>

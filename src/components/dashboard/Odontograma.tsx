@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import OdontogramaDetalheModal, {
-  STATUS_CONFIG, FACES, type DenteData, type Face, type StatusFace, type HistoricoItem,
+  STATUS_CONFIG, FACES, type DenteData, type Face, type StatusFace, type HistoricoItem, type ConsultaRelacionada,
 } from './OdontogramaDetalheModal'
 
 export type { DenteData }
@@ -120,6 +120,8 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
   const [denteHover, setDenteHover] = useState<number | null>(null)
   const [historico, setHistorico] = useState<HistoricoItem[]>([])
   const [carregandoHistorico, setCarregandoHistorico] = useState(false)
+  const [consultas, setConsultas] = useState<ConsultaRelacionada[]>([])
+  const [carregandoConsultas, setCarregandoConsultas] = useState(false)
 
   function handleAbrirDente(numero: number) {
     setDenteAberto(numero)
@@ -146,6 +148,25 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
         .limit(20)
       if (!cancelado && !error && data) setHistorico(data as HistoricoItem[])
       if (!cancelado) setCarregandoHistorico(false)
+    }
+    carregar()
+    return () => { cancelado = true }
+  }, [denteAberto, pacienteId])
+
+  useEffect(() => {
+    if (!denteAberto) return
+    let cancelado = false
+    async function carregar() {
+      setCarregandoConsultas(true)
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('id, scheduled_at, procedimento_realizado')
+        .eq('patient_id', pacienteId)
+        .contains('dentes_tratados', [denteAberto])
+        .order('scheduled_at', { ascending: false })
+      if (!cancelado && !error && data) setConsultas(data as ConsultaRelacionada[])
+      if (!cancelado) setCarregandoConsultas(false)
     }
     carregar()
     return () => { cancelado = true }
@@ -362,6 +383,8 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
           onFechar={handleFecharModal}
           historico={historico}
           carregandoHistorico={carregandoHistorico}
+          consultas={consultas}
+          carregandoConsultas={carregandoConsultas}
         />
       )}
 

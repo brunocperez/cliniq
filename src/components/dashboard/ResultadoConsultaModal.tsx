@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
+import SeletorDentes from '@/components/dashboard/SeletorDentes'
+
 
 interface Props {
   consultaId: string
@@ -43,7 +45,7 @@ export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) 
   const supabase = createClient()
 
   const [procedimento, setProcedimento] = useState('')
-  const [dente, setDente] = useState('')
+  const [dentesTratados, setDentesTratados] = useState<number[]>([])
   const [evolucao, setEvolucao] = useState('')
   const [proximoPasso, setProximoPasso] = useState('')
   const [loading, setLoading] = useState(false)
@@ -56,7 +58,7 @@ export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) 
       .update({
         status: 'realizado',
         procedimento_realizado: procedimento || null,
-        dente_tratado: dente || null,
+        dentes_tratados: dentesTratados.length > 0 ? dentesTratados : null,
         evolucao: evolucao || null,
         proximo_passo: proximoPasso || null,
       })
@@ -97,17 +99,7 @@ export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) 
         </div>
 
         <div>
-          <label style={labelStyle}>Dente(s) tratado(s)</label>
-          <input
-            type="text"
-            value={dente}
-            onChange={e => setDente(e.target.value)}
-            placeholder="Ex: 36, 37 — ou região: arco superior"
-            style={inputStyle}
-          />
-          <p style={{ margin: '4px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>
-            Em breve: odontograma visual com seleção por IA 🦷
-          </p>
+          <SeletorDentes value={dentesTratados} onChange={setDentesTratados} label="Dente(s) tratado(s)" />
         </div>
 
         <div>

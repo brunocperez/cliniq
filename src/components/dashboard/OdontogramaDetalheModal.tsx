@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 export type StatusFace = 'higido' | 'cariado' | 'restaurado' | 'ausente' | 'implante' | 'canal'
 export type Face = 'oclusal' | 'mesial' | 'distal' | 'vestibular' | 'lingual'
@@ -34,6 +35,12 @@ export interface HistoricoItem {
   criado_em: string
 }
 
+export interface ConsultaRelacionada {
+  id: string
+  scheduled_at: string
+  procedimento_realizado: string | null
+}
+
 interface Props {
   numero: number
   data: DenteData
@@ -47,6 +54,8 @@ interface Props {
   onFechar: () => void
   historico: HistoricoItem[]
   carregandoHistorico: boolean
+  consultas: ConsultaRelacionada[]
+  carregandoConsultas: boolean
 }
 
 // Diagrama quadrado do dente (mesmo design validado da primeira versão),
@@ -139,7 +148,7 @@ function formatarValorHistorico(campo: 'status' | 'nota', valor: string | null):
 export default function OdontogramaDetalheModal({
   numero, data, faceSelecionada, salvando,
   onSelecionarFace, onSelecionarStatus, onLimparFace, onLimparDente, onSalvarNota, onFechar,
-  historico, carregandoHistorico,
+  historico, carregandoHistorico, consultas, carregandoConsultas,
 }: Props) {
   const [notaDraft, setNotaDraft] = useState(data.nota ?? '')
   const [historicoAberto, setHistoricoAberto] = useState(false)
@@ -303,6 +312,37 @@ export default function OdontogramaDetalheModal({
               </button>
             )}
           </div>
+        </div>
+
+        {/* Consultas relacionadas a este dente */}
+        <div style={{ padding: '16px 20px', borderTop: '1px solid var(--border-divider)' }}>
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Consultas deste dente</span>
+          {carregandoConsultas ? (
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 8 }}>Carregando...</p>
+          ) : consultas.length === 0 ? (
+            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 8 }}>Nenhuma consulta registrada para este dente</p>
+          ) : (
+            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {consultas.map(c => (
+                <Link
+                  key={c.id}
+                  href={`/dashboard/agenda/${c.id}`}
+                  style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    fontSize: 'var(--text-xs)', padding: '8px 10px', borderRadius: 'var(--radius-md, 6px)',
+                    border: '1px solid var(--border-default)', color: 'var(--text-strong)', textDecoration: 'none',
+                  }}
+                >
+                  <span>
+                    {new Date(c.scheduled_at).toLocaleDateString('pt-BR')}
+                    {' — '}
+                    {c.procedimento_realizado ?? 'Sem procedimento registrado'}
+                  </span>
+                  <span style={{ color: 'var(--brand)', flexShrink: 0, marginLeft: 8 }}>Ver →</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Histórico de alterações */}
