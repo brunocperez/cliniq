@@ -5,9 +5,10 @@ import Link from 'next/link'
 import StatusBadge from '@/components/ui/StatusBadge'
 import PacienteNotes from '@/components/dashboard/PacienteNotes'
 import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
+import Odontograma from '@/components/dashboard/Odontograma'
 
 type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
-type Aba = 'resumo' | 'historico'
+type Aba = 'resumo' | 'odontograma' | 'historico'
 
 interface Consulta {
   id: string
@@ -28,6 +29,7 @@ interface Props {
     phone: string
     notes: string | null
     created_at: string
+    odontograma?: Record<string, unknown>
   }
   consultas: Consulta[]
 }
@@ -55,6 +57,7 @@ export default function PacienteView({ paciente, consultas }: Props) {
 
   const abas: { value: Aba; label: string }[] = [
     { value: 'resumo', label: 'Resumo' },
+    { value: 'odontograma', label: 'Odontograma' },
     { value: 'historico', label: `Histórico (${consultas.length})` },
   ]
 
@@ -175,6 +178,12 @@ export default function PacienteView({ paciente, consultas }: Props) {
             </div>
           )}
         </div>
+      )}
+
+      {aba === 'odontograma' && (
+        <Odontograma
+            pacienteId={paciente.id}
+                odontogramaInicial={(paciente.odontograma as unknown as Record<string, import('@/components/dashboard/Odontograma').DenteData>) ?? {}}        />
       )}
 
       {/* Aba Histórico */}
