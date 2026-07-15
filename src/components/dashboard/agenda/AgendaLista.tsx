@@ -1,6 +1,5 @@
 'use client'
 
-import ConsultaActions from '@/components/dashboard/ConsultaActions'
 import StatusBadge from '@/components/ui/StatusBadge'
 import Button from '@/components/ui/Button'
 import { Consulta } from './types'
@@ -76,9 +75,6 @@ export default function AgendaLista({
               </div>
               <div className="flex items-center gap-2">
                 <StatusBadge status={consulta.status as 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'} />
-                {!mostrarArquivados && (
-                  <ConsultaActions consultaId={consulta.id} statusAtual={consulta.status} />
-                )}
               </div>
             </div>
           </div>

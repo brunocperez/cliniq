@@ -7,6 +7,7 @@ import PacienteNotes from '@/components/dashboard/PacienteNotes'
 import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
 import Odontograma from '@/components/dashboard/Odontograma'
 import PlanoTratamento from '@/components/dashboard/PlanoTratamento'
+import OdontogramaSnapshots from '@/components/dashboard/OdontogramaSnapshots'
 
 type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
 type Aba = 'resumo' | 'odontograma' | 'plano'| 'historico'
@@ -184,9 +185,14 @@ export default function PacienteView({ paciente, consultas }: Props) {
       )}
 
       {aba === 'odontograma' && (
-        <Odontograma
-            pacienteId={paciente.id}
-                odontogramaInicial={(paciente.odontograma as unknown as Record<string, import('@/components/dashboard/Odontograma').DenteData>) ?? {}}        />
+        <>
+          <Odontograma
+              pacienteId={paciente.id}
+              pacienteNome={paciente.name}
+              pacienteTelefone={paciente.phone}
+                  odontogramaInicial={(paciente.odontograma as unknown as Record<string, import('@/components/dashboard/Odontograma').DenteData>) ?? {}}        />
+          <OdontogramaSnapshots pacienteId={paciente.id} />
+        </>
       )}
 
       {aba === 'plano' && (

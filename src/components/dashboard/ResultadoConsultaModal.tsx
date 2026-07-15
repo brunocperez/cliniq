@@ -40,6 +40,51 @@ const textareaStyle = {
   minHeight: 80,
 }
 
+// Cria um snapshot do odontograma do paciente, mas só se houver mudança
+// em relação ao último snapshot (evita duplicatas idênticas).
+async function criarSnapshotSeMudou(
+  supabase: ReturnType<typeof createClient>,
+  consultaId: string,
+) {
+  // 1. Descobre de qual paciente é esta consulta
+  const { data: consulta } = await supabase
+    .from('appointments')
+    .select('patient_id')
+    .eq('id', consultaId)
+    .single()
+  if (!consulta?.patient_id) return
+  const patientId = consulta.patient_id
+
+  // 2. Pega o odontograma atual do paciente
+  const { data: paciente } = await supabase
+    .from('patients')
+    .select('odontograma')
+    .eq('id', patientId)
+    .single()
+  const odontogramaAtual = paciente?.odontograma ?? {}
+
+  // 3. Pega o último snapshot pra comparar
+  const { data: ultimoSnapshot } = await supabase
+    .from('odontograma_snapshots')
+    .select('odontograma')
+    .eq('patient_id', patientId)
+    .order('criado_em', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  // 4. Se o estado atual é igual ao último snapshot, não cria outro
+  const atualStr = JSON.stringify(odontogramaAtual)
+  const ultimoStr = JSON.stringify(ultimoSnapshot?.odontograma ?? null)
+  if (ultimoSnapshot && atualStr === ultimoStr) return
+
+  // 5. Cria o snapshot novo
+  await supabase.from('odontograma_snapshots').insert({
+    patient_id: patientId,
+    appointment_id: consultaId,
+    odontograma: odontogramaAtual,
+  })
+}
+
 export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) {
   const router = useRouter()
   const supabase = createClient()
@@ -63,6 +108,8 @@ export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) 
         proximo_passo: proximoPasso || null,
       })
       .eq('id', consultaId)
+
+    await criarSnapshotSeMudou(supabase, consultaId)
 
     setLoading(false)
     router.refresh()

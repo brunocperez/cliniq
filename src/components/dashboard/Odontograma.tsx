@@ -4,12 +4,16 @@ import { createClient } from '@/lib/supabase/client'
 import OdontogramaDetalheModal, {
   STATUS_CONFIG, FACES, type DenteData, type Face, type StatusFace, type HistoricoItem, type ConsultaRelacionada,
 } from './OdontogramaDetalheModal'
+import OdontogramaPDFButton from './OdontogramaPDFButton'
 
 export type { DenteData }
 
 interface Props {
   pacienteId: string
-  odontogramaInicial: Record<string, DenteData>
+  pacienteNome?: string | null
+ pacienteTelefone?: string
+ odontogramaInicial: Record<string, DenteData>
+  
 }
 
 // ---------------------------------------------------------------------------
@@ -23,10 +27,10 @@ interface Props {
 // nova imagem que eu regenero essa lista, ou ajuste IMG_W/IMG_H e os pontos
 // manualmente se preferir fazer você mesmo).
 // ---------------------------------------------------------------------------
-const IMG_W = 2200
-const IMG_H = 1326
+export const IMG_W = 2200
+export const IMG_H = 1326
 
-const TOOTH_SHAPES: { numero: number; points: string }[] = [
+export const TOOTH_SHAPES: { numero: number; points: string }[] = [
   { numero: 11, points: '1021,251 1010,274 997,445 986,515 967,581 966,610 975,637 992,652 1023,657 1088,654 1108,639 1113,607 1087,520 1055,292 1036,259' },
   { numero: 12, points: '907,274 891,291 879,343 878,524 870,621 875,639 883,648 949,652 962,641 964,625 919,380 919,288 914,277' },
   { numero: 13, points: '797,208 789,222 792,290 774,435 773,523 754,605 761,628 794,661 813,666 829,659 862,619 866,597 848,515 823,256 813,225' },
@@ -63,7 +67,7 @@ const TOOTH_SHAPES: { numero: number; points: string }[] = [
 
 // Caminho da imagem-base — salve o arquivo em /public com este nome
 // (ou ajuste o caminho abaixo).
-const IMAGEM_BASE = '/odontograma-base.png'
+export const IMAGEM_BASE = '/odontograma-base.png'
 
 // Bounding box de cada dente (calculado uma vez a partir dos pontos do
 // contorno), usado só para posicionar o tooltip de hover perto do dente.
@@ -79,15 +83,15 @@ for (const t of TOOTH_SHAPES) {
 // Regra de severidade agregada por dente (cor do painel geral).
 // Fácil de ajustar: só mexer nesta função.
 // ---------------------------------------------------------------------------
-type Severidade = 'vermelho' | 'amarelo' | 'verde' | null
+export type Severidade = 'vermelho' | 'amarelo' | 'verde' | null
 
-const SEVERIDADE_COR: Record<Exclude<Severidade, null>, string> = {
+export const SEVERIDADE_COR: Record<Exclude<Severidade, null>, string> = {
   vermelho: '#dc2626',
   amarelo: '#eab308',
   verde: '#16a34a',
 }
 
-function calcularSeveridade(data: DenteData): Severidade {
+export function calcularSeveridade(data: DenteData): Severidade {
   const statuses = FACES.map(f => data[f]).filter(Boolean) as StatusFace[]
   if (statuses.includes('cariado')) return 'vermelho'
   if (statuses.includes('canal')) return 'amarelo'
@@ -112,7 +116,7 @@ function resumoFaces(data: DenteData): { face: string; label: string; cor: strin
     })
 }
 
-export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
+export default function Odontograma({ pacienteId, pacienteNome, pacienteTelefone, odontogramaInicial }: Props) {
   const [odontograma, setOdontograma] = useState<Record<string, DenteData>>(odontogramaInicial)
   const [denteAberto, setDenteAberto] = useState<number | null>(null)
   const [faceSelecionada, setFaceSelecionada] = useState<Face | null>('oclusal')
@@ -263,11 +267,19 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
   return (
     <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
       {/* Header */}
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border-divider)' }}>
-        <h2 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Odontograma</h2>
-        <p style={{ margin: '2px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-          Clique em um dente para ver e editar os detalhes
-        </p>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border-divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Odontograma</h2>
+          <p style={{ margin: '2px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+            Clique em um dente para ver e editar os detalhes
+          </p>
+        </div>
+        <OdontogramaPDFButton
+          pacienteId={pacienteId}
+          pacienteNome={pacienteNome ?? null}
+          pacienteTelefone={pacienteTelefone ?? ''}
+          odontograma={odontograma}
+        />
       </div>
 
       {/* Legenda de severidade + contador */}
@@ -288,7 +300,7 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
 
       {/* Painel panorâmico */}
       <div style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ position: 'relative', width: '100%', maxWidth: 720 }}>
+        <div id="odontograma-captura" style={{ position: 'relative', width: '100%', maxWidth: 720 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={IMAGEM_BASE} alt="Odontograma panorâmico" className="odontograma-img" style={{ width: '100%', display: 'block', userSelect: 'none' }} draggable={false} />
           <svg
