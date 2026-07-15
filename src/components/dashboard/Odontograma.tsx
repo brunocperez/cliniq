@@ -290,7 +290,7 @@ export default function Odontograma({ pacienteId, odontogramaInicial }: Props) {
       <div style={{ padding: '20px', display: 'flex', justifyContent: 'center' }}>
         <div style={{ position: 'relative', width: '100%', maxWidth: 720 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={IMAGEM_BASE} alt="Odontograma panorâmico" style={{ width: '100%', display: 'block', userSelect: 'none' }} draggable={false} />
+          <img src={IMAGEM_BASE} alt="Odontograma panorâmico" className="odontograma-img" style={{ width: '100%', display: 'block', userSelect: 'none' }} draggable={false} />
           <svg
             viewBox={`0 0 ${IMG_W} ${IMG_H}`}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}

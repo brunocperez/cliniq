@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
-import { inputStyle, labelStyle } from '@/lib/styles'
+import { inputStyle } from '@/lib/styles'
 
 interface Servico {
   id: string

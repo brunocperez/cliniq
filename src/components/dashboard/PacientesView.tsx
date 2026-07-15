@@ -7,19 +7,6 @@ import ConfirmModal from '@/components/ui/ConfirmModal'
 import Button from '@/components/ui/Button'
 import NovoPacienteModal from '@/components/dashboard/NovoPacienteModal'
 
-interface Consulta {
-  id: string
-  scheduled_at: string
-  status: string
-  notes: string | null
-  procedimento_realizado: string | null
-  dente_tratado: string | null
-  dentes_tratados: number[] | null
-  evolucao: string | null
-  proximo_passo: string | null
-  services: { name: string } | null
-}
-
 interface Paciente {
   id: string
   name: string | null

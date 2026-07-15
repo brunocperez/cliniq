@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
 import PasswordInput, { senhaValida } from '@/components/ui/PasswordInput'
-import { inputStyle, labelStyle } from '@/lib/styles'
+import { inputStyle } from '@/lib/styles'
 
 export default function AtualizarSenhaPage() {
   const router = useRouter()

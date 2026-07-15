@@ -147,3 +147,7 @@
 .loading-dente-sombra {
   animation: sombra-pulsar 1.6s ease-in-out infinite;
 }
+/* Odontograma: traços pretos ficam claros no dark mode (imagem tem fundo transparente) */
+.dark .odontograma-img {
+  filter: invert(0.85);
+}

@@ -43,6 +43,18 @@ export async function POST(request: NextRequest) {
 
   const tenantId = profile.tenant_id
 
+  // Garante que o paciente pertence ao tenant do usuário
+  const { data: pacienteDoTenant } = await adminSupabase
+    .from('patients')
+    .select('id')
+    .eq('id', pacienteId)
+    .eq('tenant_id', tenantId)
+    .single()
+
+  if (!pacienteDoTenant) {
+    return NextResponse.json({ error: 'Paciente não encontrado.' }, { status: 404 })
+  }
+
   // Verifica conflito de horário no servidor
   const inicio = new Date(scheduledAt)
   const fim = new Date(inicio.getTime() + (duracao ?? 60) * 60000)

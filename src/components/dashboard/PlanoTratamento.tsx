@@ -81,7 +81,7 @@ export default function PlanoTratamento({ pacienteId }: Props) {
     return texto
       .split(',')
       .map(s => parseInt(s.trim(), 10))
-      .filter(n => !isNaN(n) && n >= 11 && n <= 48)
+      .filter(n => !isNaN(n) && [1, 2, 3, 4].includes(Math.floor(n / 10)) && n % 10 >= 1 && n % 10 <= 8)
   }
 
   async function handleAdicionarItem() {

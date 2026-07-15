@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
-import { inputStyle, labelStyle } from '@/lib/styles'
+import { inputStyle } from '@/lib/styles'
 
 export default function RecuperarSenhaPage() {
   const supabase = createClient()

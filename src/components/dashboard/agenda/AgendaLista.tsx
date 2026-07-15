@@ -1,7 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import ConsultaActions from '@/components/dashboard/ConsultaActions'
 import StatusBadge from '@/components/ui/StatusBadge'
 import Button from '@/components/ui/Button'

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
-import { inputStyle, labelStyle } from '@/lib/styles'
+import { inputStyle } from '@/lib/styles'
 
 type Role = 'clinica' | 'admin'
 

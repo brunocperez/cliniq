@@ -38,7 +38,8 @@ export default async function ConsultaDetalhesPage({ params }: { params: Promise
 
   const paciente = consulta.patients as { id: string; name: string; phone: string } | null
   const servico = consulta.services as { name: string; duration_minutes: number } | null
-  const temResultado = consulta.procedimento_realizado || consulta.dente_tratado || consulta.evolucao || consulta.proximo_passo
+  const dentesTratados = (consulta.dentes_tratados as number[] | null)?.join(', ') || consulta.dente_tratado
+  const temResultado = consulta.procedimento_realizado || dentesTratados || consulta.evolucao || consulta.proximo_passo
 
   return (
     <div style={{ maxWidth: 560 }}>
@@ -80,7 +81,7 @@ export default async function ConsultaDetalhesPage({ params }: { params: Promise
             {temResultado ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <Campo label="Procedimento realizado" valor={consulta.procedimento_realizado} />
-                <Campo label="Dente(s) tratado(s)" valor={consulta.dente_tratado} />
+                <Campo label="Dente(s) tratado(s)" valor={dentesTratados} />
                 <Campo label="Evolução clínica" valor={consulta.evolucao} />
                 <Campo label="Próximo passo" valor={consulta.proximo_passo} />
               </div>

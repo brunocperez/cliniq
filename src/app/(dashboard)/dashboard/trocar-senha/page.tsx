@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import PasswordInput, { senhaValida } from '@/components/ui/PasswordInput'
 import Button from '@/components/ui/Button'
 import Image from 'next/image'
-import { inputStyle, labelStyle } from '@/lib/styles'
+import { inputStyle } from '@/lib/styles'
 
 export default function TrocarSenhaPage() {
   const supabase = createClient()

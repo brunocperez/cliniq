@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
-import PhoneInput from '@/components/ui/PhoneInput'
 import { inputStyle, labelStyle } from '@/lib/styles'
 
 interface Props {
