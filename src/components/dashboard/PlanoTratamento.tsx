@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { DenteData } from '@/components/dashboard/Odontograma'
+import SeletorDentes from '@/components/dashboard/SeletorDentes'
+import InputMoeda from '@/components/ui/InputMoeda'
 
 type StatusItem = 'planejado' | 'andamento' | 'concluido'
 
@@ -29,10 +31,6 @@ const STATUS_ITEM_CONFIG: Record<StatusItem, { label: string; cor: string }> = {
   concluido: { label: 'Concluído', cor: '#16a34a' },
 }
 
-// -----------------------------------------------------------------------
-// Ao concluir um item, esta é a face + status aplicado automaticamente
-// em cada dente do item no odontograma. Ajuste aqui se quiser outro padrão.
-// -----------------------------------------------------------------------
 const FACE_AO_CONCLUIR = 'oclusal'
 const STATUS_AO_CONCLUIR = 'restaurado'
 
@@ -48,8 +46,14 @@ export default function PlanoTratamento({ pacienteId }: Props) {
 
   // Form de novo item
   const [novoServicoId, setNovoServicoId] = useState('')
-  const [novoDentes, setNovoDentes] = useState('')
+  const [novoDentes, setNovoDentes] = useState<number[]>([])
   const [novoValor, setNovoValor] = useState('')
+
+  // Edição de item existente
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [editServicoId, setEditServicoId] = useState('')
+  const [editDentes, setEditDentes] = useState<number[]>([])
+  const [editValor, setEditValor] = useState('')
 
   useEffect(() => {
     let cancelado = false
@@ -77,16 +81,8 @@ export default function PlanoTratamento({ pacienteId }: Props) {
     return () => { cancelado = true }
   }, [pacienteId])
 
-  function parseDentes(texto: string): number[] {
-    return texto
-      .split(',')
-      .map(s => parseInt(s.trim(), 10))
-      .filter(n => !isNaN(n) && [1, 2, 3, 4].includes(Math.floor(n / 10)) && n % 10 >= 1 && n % 10 <= 8)
-  }
-
   async function handleAdicionarItem() {
-    const dentes = parseDentes(novoDentes)
-    if (!novoServicoId || dentes.length === 0) return
+    if (!novoServicoId) return
     setSalvando(true)
     const supabase = createClient()
     const servico = servicos.find(s => s.id === novoServicoId)
@@ -96,7 +92,7 @@ export default function PlanoTratamento({ pacienteId }: Props) {
       .insert({
         patient_id: pacienteId,
         service_id: novoServicoId,
-        dentes,
+        dentes: novoDentes,
         status: 'planejado',
         ordem: proximaOrdem,
         valor_estimado: novoValor ? parseFloat(novoValor) : (servico?.price ?? null),
@@ -106,8 +102,41 @@ export default function PlanoTratamento({ pacienteId }: Props) {
     if (!error && data) {
       setItens(prev => [...prev, data as ItemPlano])
       setNovoServicoId('')
-      setNovoDentes('')
+      setNovoDentes([])
       setNovoValor('')
+    }
+    setSalvando(false)
+  }
+
+  function iniciarEdicao(item: ItemPlano) {
+    setEditandoId(item.id)
+    setEditServicoId(item.service_id)
+    setEditDentes(item.dentes ?? [])
+    setEditValor(item.valor_estimado != null ? String(item.valor_estimado) : '')
+  }
+
+  function cancelarEdicao() {
+    setEditandoId(null)
+  }
+
+  async function handleSalvarEdicao(item: ItemPlano) {
+    if (!editServicoId) return
+    setSalvando(true)
+    const supabase = createClient()
+    const patch = {
+      service_id: editServicoId,
+      dentes: editDentes,
+      valor_estimado: editValor ? parseFloat(editValor) : null,
+    }
+    const { data, error } = await supabase
+      .from('plano_tratamento_itens')
+      .update(patch)
+      .eq('id', item.id)
+      .select('*, services(name, price)')
+      .single()
+    if (!error && data) {
+      setItens(prev => prev.map(i => (i.id === item.id ? (data as ItemPlano) : i)))
+      setEditandoId(null)
     }
     setSalvando(false)
   }
@@ -127,8 +156,8 @@ export default function PlanoTratamento({ pacienteId }: Props) {
     if (!error) {
       setItens(prev => prev.map(i => (i.id === item.id ? { ...i, ...patch } : i)))
 
-      // Integração: ao concluir, aplica o status no odontograma de cada dente do item
-      if (novoStatus === 'concluido') {
+      // Ao concluir, aplica no odontograma — SÓ se o item tiver dentes definidos
+      if (novoStatus === 'concluido' && item.dentes && item.dentes.length > 0) {
         const { data: paciente } = await supabase
           .from('patients')
           .select('odontograma')
@@ -141,7 +170,6 @@ export default function PlanoTratamento({ pacienteId }: Props) {
         }
         await supabase.from('patients').update({ odontograma: novoOdontograma }).eq('id', pacienteId)
 
-        // Registra também no histórico do odontograma, pra manter rastreabilidade
         for (const dente of item.dentes) {
           await supabase.from('odontograma_historico').insert({
             patient_id: pacienteId,
@@ -168,6 +196,8 @@ export default function PlanoTratamento({ pacienteId }: Props) {
   const valorTotal = itens.reduce((soma, i) => soma + (i.valor_estimado ?? 0), 0)
   const valorConcluido = itens.filter(i => i.status === 'concluido').reduce((soma, i) => soma + (i.valor_estimado ?? 0), 0)
 
+  const selectStyleSm = { fontSize: 'var(--text-xs)', padding: '6px 10px', borderRadius: 'var(--radius-md, 6px)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-sans)' }
+
   return (
     <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
       {/* Header */}
@@ -191,6 +221,26 @@ export default function PlanoTratamento({ pacienteId }: Props) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {itens.map(item => {
               const cfg = STATUS_ITEM_CONFIG[item.status]
+              const emEdicao = editandoId === item.id
+
+              if (emEdicao) {
+                return (
+                  <div key={item.id} style={{ padding: '12px 14px', borderRadius: 'var(--radius-md, 8px)', border: '1px solid var(--brand)', background: 'var(--surface-sunken)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <select value={editServicoId} onChange={e => setEditServicoId(e.target.value)} style={{ ...selectStyleSm, width: '100%' }}>
+                        {servicos.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      </select>
+                      <SeletorDentes value={editDentes} onChange={setEditDentes} label="Dente(s) — opcional" inline />
+                      <InputMoeda value={editValor ? parseFloat(editValor) : null} onChange={v => setEditValor(v != null ? String(v) : '')} style={{ ...selectStyleSm, width: 140 }} />
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button onClick={() => handleSalvarEdicao(item)} style={{ fontSize: 'var(--text-xs)', padding: '6px 16px', borderRadius: 'var(--radius-pill)', border: 'none', background: 'var(--brand)', color: 'white', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Salvar</button>
+                        <button onClick={cancelarEdicao} style={{ fontSize: 'var(--text-xs)', padding: '6px 16px', borderRadius: 'var(--radius-pill)', border: '1px solid var(--border-default)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>Cancelar</button>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+
               return (
                 <div
                   key={item.id}
@@ -202,7 +252,9 @@ export default function PlanoTratamento({ pacienteId }: Props) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-strong)', fontWeight: 500 }}>
                       {item.services?.name ?? 'Serviço removido'}
-                      <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}> · Dente(s) {item.dentes.join(', ')}</span>
+                      <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
+                        {item.dentes && item.dentes.length > 0 ? ` · Dente(s) ${item.dentes.join(', ')}` : ' · Sem dente definido'}
+                      </span>
                     </p>
                     <p style={{ margin: '2px 0 0', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
                       R$ {(item.valor_estimado ?? 0).toFixed(2)}
@@ -223,6 +275,13 @@ export default function PlanoTratamento({ pacienteId }: Props) {
                   </select>
 
                   <button
+                    onClick={() => iniciarEdicao(item)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-sans)' }}
+                  >
+                    Editar
+                  </button>
+
+                  <button
                     onClick={() => handleExcluirItem(item)}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger-600)', fontSize: 'var(--text-xs)', fontFamily: 'var(--font-sans)' }}
                   >
@@ -238,7 +297,7 @@ export default function PlanoTratamento({ pacienteId }: Props) {
       {/* Adicionar novo item */}
       <div style={{ padding: '16px 20px 20px', borderTop: '1px solid var(--border-divider)', background: 'var(--surface-sunken)' }}>
         <p style={{ margin: '0 0 10px', fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Adicionar item</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 360 }}>
           <select
             value={novoServicoId}
             onChange={e => {
@@ -246,7 +305,7 @@ export default function PlanoTratamento({ pacienteId }: Props) {
               const s = servicos.find(sv => sv.id === e.target.value)
               if (s) setNovoValor(String(s.price))
             }}
-            style={{ fontSize: 'var(--text-xs)', padding: '6px 10px', borderRadius: 'var(--radius-md, 6px)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-sans)', minWidth: 180 }}
+            style={{ ...selectStyleSm, width: '100%' }}
           >
             <option value="">Selecione o serviço...</option>
             {servicos.map(s => (
@@ -254,29 +313,21 @@ export default function PlanoTratamento({ pacienteId }: Props) {
             ))}
           </select>
 
-          <input
-            type="text"
-            placeholder="Dente(s), ex: 16, 17"
-            value={novoDentes}
-            onChange={e => setNovoDentes(e.target.value)}
-            style={{ fontSize: 'var(--text-xs)', padding: '6px 10px', borderRadius: 'var(--radius-md, 6px)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-sans)', width: 140 }}
-          />
+          <SeletorDentes value={novoDentes} onChange={setNovoDentes} label="Dente(s) — opcional" inline />
 
-          <input
-            type="number"
-            placeholder="Valor (R$)"
-            value={novoValor}
-            onChange={e => setNovoValor(e.target.value)}
-            style={{ fontSize: 'var(--text-xs)', padding: '6px 10px', borderRadius: 'var(--radius-md, 6px)', border: '1px solid var(--border-default)', fontFamily: 'var(--font-sans)', width: 110 }}
+          <InputMoeda
+            value={novoValor ? parseFloat(novoValor) : null}
+            onChange={v => setNovoValor(v != null ? String(v) : '')}
+            style={{ ...selectStyleSm, width: 140 }}
           />
 
           <button
             onClick={handleAdicionarItem}
-            disabled={!novoServicoId || parseDentes(novoDentes).length === 0}
+            disabled={!novoServicoId}
             style={{
-              fontSize: 'var(--text-xs)', padding: '6px 16px', borderRadius: 'var(--radius-pill)', border: 'none',
+              fontSize: 'var(--text-xs)', padding: '8px 16px', borderRadius: 'var(--radius-pill)', border: 'none',
               background: 'var(--brand)', color: 'white', cursor: 'pointer', fontFamily: 'var(--font-sans)',
-              opacity: (!novoServicoId || parseDentes(novoDentes).length === 0) ? 0.5 : 1,
+              opacity: !novoServicoId ? 0.5 : 1, width: 'fit-content',
             }}
           >
             Adicionar

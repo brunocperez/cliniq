@@ -25,7 +25,7 @@ function getInicioDaSemana(data: Date) {
 
 export default function AgendaView({ consultas, servicos, comModal = false }: Props) {
   const router = useRouter()
-  const [visualizacao, setVisualizacao] = useState<Visualizacao>('semanal')
+  const [visualizacao, setVisualizacao] = useState<Visualizacao>('lista')
   const [filtroStatus, setFiltroStatus] = useState<Filtro>('todos')
   const [filtroServico, setFiltroServico] = useState('')
   const [filtroDataInicio, setFiltroDataInicio] = useState('')

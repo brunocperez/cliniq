@@ -12,9 +12,10 @@ interface Props {
   value: number[]
   onChange: (dentes: number[]) => void
   label?: string
+  inline?: boolean   // quando true, o painel de dentes ocupa espaço (não flutua) — evita ser cortado por overflow:hidden
 }
 
-export default function SeletorDentes({ value, onChange, label = 'Dente(s)' }: Props) {
+export default function SeletorDentes({ value, onChange, label = 'Dente(s)', inline = false }: Props) {
   const [aberto, setAberto] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -54,7 +55,11 @@ export default function SeletorDentes({ value, onChange, label = 'Dente(s)' }: P
 
       {aberto && (
         <div
-          style={{
+          style={inline ? {
+            marginTop: 4,
+            background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md, 8px)',
+            padding: 12, maxHeight: 320, overflowY: 'auto',
+          } : {
             position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, zIndex: 50,
             background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md, 8px)',
             boxShadow: '0 8px 24px rgba(0,0,0,0.15)', padding: 12, maxHeight: 320, overflowY: 'auto',
