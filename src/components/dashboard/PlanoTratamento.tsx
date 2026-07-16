@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { DenteData } from '@/components/dashboard/Odontograma'
 import SeletorDentes from '@/components/dashboard/SeletorDentes'
 import InputMoeda from '@/components/ui/InputMoeda'
+import { useToast } from '@/components/ui/ToastProvider'
 
 type StatusItem = 'planejado' | 'andamento' | 'concluido'
 
@@ -54,6 +55,7 @@ export default function PlanoTratamento({ pacienteId }: Props) {
   const [editServicoId, setEditServicoId] = useState('')
   const [editDentes, setEditDentes] = useState<number[]>([])
   const [editValor, setEditValor] = useState('')
+  const { mostrarToast } = useToast()
 
   useEffect(() => {
     let cancelado = false
@@ -104,6 +106,9 @@ export default function PlanoTratamento({ pacienteId }: Props) {
       setNovoServicoId('')
       setNovoDentes([])
       setNovoValor('')
+      mostrarToast('Item adicionado ao plano.', 'sucesso')
+    } else {
+      mostrarToast('Erro ao adicionar item ao plano.')
     }
     setSalvando(false)
   }
@@ -137,6 +142,9 @@ export default function PlanoTratamento({ pacienteId }: Props) {
     if (!error && data) {
       setItens(prev => prev.map(i => (i.id === item.id ? (data as ItemPlano) : i)))
       setEditandoId(null)
+      mostrarToast('Item atualizado.', 'sucesso')
+    } else {
+      mostrarToast('Erro ao atualizar item.')
     }
     setSalvando(false)
   }
@@ -181,6 +189,8 @@ export default function PlanoTratamento({ pacienteId }: Props) {
           })
         }
       }
+    } else {
+      mostrarToast('Erro ao mudar o status do item.')
     }
     setSalvando(false)
   }

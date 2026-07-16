@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { ToastProvider } from '@/components/ui/ToastProvider'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -27,7 +28,9 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable}`} style={{ fontFamily: 'var(--font-geist), system-ui, sans-serif', background: 'var(--surface-app)', color: 'var(--text-body)' }}>
         <ThemeProvider>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

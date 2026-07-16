@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import {
   STATUS_CONFIG, FACES, type Face, type StatusFace,
 } from '@/components/dashboard/OdontogramaDetalheModal'
+import { useToast } from '@/components/ui/ToastProvider'
 
 interface Props {
   consultaId: string
@@ -84,6 +85,7 @@ export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) 
   const [evolucao, setEvolucao] = useState('')
   const [proximoPasso, setProximoPasso] = useState('')
   const [loading, setLoading] = useState(false)
+  const { mostrarToast } = useToast()
 
   // Ao abrir, busca a categoria e o status_aplicado do serviço desta consulta
   useEffect(() => {
@@ -180,6 +182,7 @@ export default function ResultadoConsultaModal({ consultaId, onFechar }: Props) 
     // 4. Cria snapshot (depois de aplicar tudo)
     await criarSnapshotSeMudou(supabase, patientId, consultaId)
 
+    mostrarToast('Consulta finalizada com sucesso.', 'sucesso')
     setLoading(false)
     router.refresh()
     onFechar()

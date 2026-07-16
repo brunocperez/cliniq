@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import { inputStyle, labelStyle } from '@/lib/styles'
+import { useToast } from '@/components/ui/ToastProvider'
 
 // Os 6 status de dente, pra popular o seletor de "status aplicado"
 const STATUS_OPCOES = [
@@ -46,6 +47,7 @@ export default function NovoServicoModal({ onFechar, servico }: Props) {
   const [statusAplicado, setStatusAplicado] = useState(servico?.status_aplicado ?? '')
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
+  const { mostrarToast } = useToast()
 
   async function handleSalvar() {
     setErro('')
@@ -82,10 +84,12 @@ export default function NovoServicoModal({ onFechar, servico }: Props) {
 
     if (error) {
       setErro('Erro ao salvar serviço.')
+      mostrarToast('Erro ao salvar serviço.')
       setLoading(false)
       return
     }
 
+    mostrarToast(editando ? 'Serviço atualizado.' : 'Serviço criado.', 'sucesso')
     router.refresh()
     onFechar()
   }

@@ -5,6 +5,8 @@ import OdontogramaDetalheModal, {
   STATUS_CONFIG, FACES, type DenteData, type Face, type StatusFace, type HistoricoItem, type ConsultaRelacionada,
 } from './OdontogramaDetalheModal'
 import OdontogramaPDFButton from './OdontogramaPDFButton'
+import { useToast } from '@/components/ui/ToastProvider'
+
 
 export type { DenteData }
 
@@ -126,6 +128,7 @@ export default function Odontograma({ pacienteId, pacienteNome, pacienteTelefone
   const [carregandoHistorico, setCarregandoHistorico] = useState(false)
   const [consultas, setConsultas] = useState<ConsultaRelacionada[]>([])
   const [carregandoConsultas, setCarregandoConsultas] = useState(false)
+  const { mostrarToast } = useToast()
 
   function handleAbrirDente(numero: number) {
     setDenteAberto(numero)

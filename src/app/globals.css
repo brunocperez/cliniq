@@ -151,3 +151,9 @@
 .dark .odontograma-img {
   filter: invert(0.85);
 }
+
+/* Animação de entrada dos toasts */
+@keyframes toast-entrar {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
