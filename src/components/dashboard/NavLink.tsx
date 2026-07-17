@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  Home, Users, Calendar, Briefcase, BarChart2, User, CreditCard, LucideIcon
+  Home, Users, Calendar, Briefcase, BarChart2, User, CreditCard, Megaphone, LucideIcon
 } from 'lucide-react'
 
 const icones: Record<string, LucideIcon> = {
@@ -14,6 +14,7 @@ const icones: Record<string, LucideIcon> = {
   chart: BarChart2,
   user: User,
   creditCard: CreditCard,
+  megaphone: Megaphone,
 }
 
 interface Props {

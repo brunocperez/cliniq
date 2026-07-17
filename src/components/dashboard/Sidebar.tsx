@@ -41,6 +41,7 @@ export default function Sidebar() {
         <NavLink href="/dashboard/pacientes" icon="users" expandido={expandido}>Pacientes</NavLink>
         <NavLink href="/dashboard/agenda" icon="calendar" expandido={expandido}>Agenda</NavLink>
         <NavLink href="/dashboard/servicos" icon="briefcase" expandido={expandido}>Serviços</NavLink>
+        <NavLink href="/dashboard/marketing" icon="megaphone" expandido={expandido}>Marketing</NavLink>
         <NavLink href="/dashboard/metricas" icon="chart" expandido={expandido}>Métricas</NavLink>
         <NavLink href="/dashboard/perfil" icon="user" expandido={expandido}>Perfil</NavLink>
       </nav>
