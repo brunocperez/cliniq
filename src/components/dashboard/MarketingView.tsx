@@ -46,9 +46,13 @@ export default function MarketingView({ postsIniciais }: Props) {
 
   async function mudarStatus(post: Post, novoStatus: string) {
     const supabase = createClient()
-    const { error } = await supabase.from('posts_marketing').update({ status: novoStatus }).eq('id', post.id)
+    const patch: { status: string; publicado_em?: string } = { status: novoStatus }
+    if (novoStatus === 'publicado') {
+      patch.publicado_em = new Date().toISOString()
+    }
+    const { error } = await supabase.from('posts_marketing').update(patch).eq('id', post.id)
     if (!error) {
-      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: novoStatus } : p))
+      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: novoStatus, ...(patch.publicado_em ? { publicado_em: patch.publicado_em } : {}) } : p))
       mostrarToast('Status atualizado.', 'sucesso')
     } else {
       mostrarToast('Erro ao atualizar o status.')
