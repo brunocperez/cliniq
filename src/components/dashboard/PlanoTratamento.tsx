@@ -199,7 +199,12 @@ export default function PlanoTratamento({ pacienteId }: Props) {
     setSalvando(true)
     const supabase = createClient()
     const { error } = await supabase.from('plano_tratamento_itens').delete().eq('id', item.id)
-    if (!error) setItens(prev => prev.filter(i => i.id !== item.id))
+    if (!error) {
+      setItens(prev => prev.filter(i => i.id !== item.id))
+      mostrarToast('Item removido.', 'sucesso')
+    } else {
+      mostrarToast('Erro ao remover item.')
+    }
     setSalvando(false)
   }
 

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/ui/ToastProvider'
 import CriarPostModal from '@/components/dashboard/CriarPostModal'
+import BancoImagens from '@/components/dashboard/BancoImagens'
 
 interface Post {
   id: string
@@ -41,6 +42,7 @@ export default function MarketingView({ postsIniciais }: Props) {
   const { mostrarToast } = useToast()
   const [posts, setPosts] = useState<Post[]>(postsIniciais)
   const [modalCriar, setModalCriar] = useState(false)
+  const [aba, setAba] = useState<'posts' | 'imagens'>('posts')
 
   async function mudarStatus(post: Post, novoStatus: string) {
     const supabase = createClient()
@@ -68,6 +70,33 @@ export default function MarketingView({ postsIniciais }: Props) {
 
   return (
     <div>
+      {/* Abas */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 20, borderBottom: '1px solid var(--border-divider)' }}>
+        {([
+          { value: 'posts' as const, label: 'Posts' },
+          { value: 'imagens' as const, label: 'Banco de imagens' },
+        ]).map(t => (
+          <button
+            key={t.value}
+            onClick={() => setAba(t.value)}
+            style={{
+              padding: '8px 16px', border: 'none', background: 'none', cursor: 'pointer',
+              fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)',
+              fontWeight: aba === t.value ? 600 : 400,
+              color: aba === t.value ? 'var(--brand)' : 'var(--text-muted)',
+              borderBottom: aba === t.value ? '2px solid var(--brand)' : '2px solid transparent',
+              marginBottom: -1,
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {aba === 'imagens' ? (
+        <BancoImagens />
+      ) : (
+      <>
       {/* Barra de ações */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         <button
@@ -148,6 +177,9 @@ export default function MarketingView({ postsIniciais }: Props) {
             </div>
           ))}
         </div>
+      )}
+
+      </>
       )}
 
       {modalCriar && (

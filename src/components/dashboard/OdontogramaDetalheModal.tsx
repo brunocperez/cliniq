@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import OdontogramaPDFButton from './OdontogramaPDFButton'
 
 export type StatusFace = 'higido' | 'cariado' | 'restaurado' | 'ausente' | 'implante' | 'canal'
 export type Face = 'oclusal' | 'mesial' | 'distal' | 'vestibular' | 'lingual'
@@ -57,10 +56,6 @@ interface Props {
   carregandoHistorico: boolean
   consultas: ConsultaRelacionada[]
   carregandoConsultas: boolean
-  pacienteId: string
-  pacienteNome?: string | null
-  pacienteTelefone?: string
-  odontogramaInicial: Record<string, DenteData>
 }
 
 // Diagrama quadrado do dente (mesmo design validado da primeira versão),

@@ -183,8 +183,9 @@ export default function Odontograma({ pacienteId, pacienteNome, pacienteTelefone
     setOdontograma(novoOdontograma)
     setSalvando(true)
     const supabase = createClient()
-    await supabase.from('patients').update({ odontograma: novoOdontograma }).eq('id', pacienteId)
+    const { error } = await supabase.from('patients').update({ odontograma: novoOdontograma }).eq('id', pacienteId)
     setSalvando(false)
+    if (error) mostrarToast('Erro ao salvar o odontograma. Tente novamente.')
   }
 
   async function registrarHistorico(
