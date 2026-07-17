@@ -18,6 +18,10 @@ export default function BancoImagens() {
   const [enviando, setEnviando] = useState(false)
   const [descricao, setDescricao] = useState('')
 
+  // Arquivo escolhido mas ainda NÃO enviado — só some quando clicar em Salvar
+  const [arquivoEscolhido, setArquivoEscolhido] = useState<File | null>(null)
+  const [previaUrl, setPreviaUrl] = useState<string | null>(null)
+
   useEffect(() => {
     let cancelado = false
     async function carregar() {
@@ -29,7 +33,6 @@ export default function BancoImagens() {
         .order('criado_em', { ascending: false })
 
       if (!cancelado && data) {
-        // Gera URLs assinadas pra exibir cada imagem (bucket é privado)
         const comUrls = await Promise.all(
           data.map(async (img) => {
             const { data: signed } = await supabase.storage
@@ -46,19 +49,35 @@ export default function BancoImagens() {
     return () => { cancelado = true }
   }, [])
 
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  // Passo 1: escolher a imagem — só guarda localmente e mostra a prévia
+  function handleEscolherArquivo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file) return
     e.target.value = ''
+    if (!file) return
+    setArquivoEscolhido(file)
+    setPreviaUrl(URL.createObjectURL(file))
+  }
 
+  function cancelarEscolha() {
+    setArquivoEscolhido(null)
+    setPreviaUrl(null)
+    setDescricao('')
+  }
+
+  // Passo 2: salvar de fato — sobe pro Storage e registra no banco
+  async function handleSalvar() {
+    if (!arquivoEscolhido) {
+      mostrarToast('Escolha uma imagem primeiro.')
+      return
+    }
     setEnviando(true)
     const supabase = createClient()
     try {
       const { data: profile } = await supabase.from('profiles').select('tenant_id').single()
       if (!profile?.tenant_id) throw new Error('sem tenant')
 
-      const caminho = `${profile.tenant_id}/${Date.now()}-${file.name}`
-      const { error: upErro } = await supabase.storage.from('imagens_marketing').upload(caminho, file)
+      const caminho = `${profile.tenant_id}/${Date.now()}-${arquivoEscolhido.name}`
+      const { error: upErro } = await supabase.storage.from('imagens_marketing').upload(caminho, arquivoEscolhido)
       if (upErro) throw upErro
 
       const { data, error } = await supabase
@@ -70,7 +89,7 @@ export default function BancoImagens() {
 
       const { data: signed } = await supabase.storage.from('imagens_marketing').createSignedUrl(caminho, 3600)
       setImagens(prev => [{ ...(data as ImagemBanco), url: signed?.signedUrl }, ...prev])
-      setDescricao('')
+      cancelarEscolha()
       mostrarToast('Imagem adicionada ao banco.', 'sucesso')
     } catch (err) {
       console.error('Erro no upload:', err)
@@ -96,34 +115,76 @@ export default function BancoImagens() {
 
   return (
     <div>
-      {/* Upload */}
+      {/* Adicionar imagem — fluxo em 3 passos: descrição, escolher, salvar */}
       <div style={{ background: 'var(--surface-card)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', padding: 16, marginBottom: 20 }}>
         <p style={{ margin: '0 0 10px', fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-medium)', color: 'var(--text-strong)' }}>Adicionar imagem</p>
         <p style={{ margin: '0 0 12px', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
           Suba fotos da sua clínica, atendimentos ou resultados. A IA poderá usá-las como base ao gerar a arte dos posts.
         </p>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <input
-            type="text"
-            value={descricao}
-            onChange={e => setDescricao(e.target.value)}
-            placeholder="Descrição/tag (ex: consultório, sorriso paciente)"
-            style={{
-              flex: 1, minWidth: 220, border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)',
-              padding: '8px 12px', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)',
-              background: 'var(--surface-card)', color: 'var(--text-body)',
-            }}
-          />
-          <label
-            style={{
-              fontSize: 'var(--text-sm)', padding: '8px 16px', borderRadius: 'var(--radius-pill)', border: 'none',
-              background: enviando ? 'var(--surface-sunken)' : 'var(--brand)', color: enviando ? 'var(--text-faint)' : 'white',
-              cursor: enviando ? 'wait' : 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, whiteSpace: 'nowrap',
-            }}
-          >
-            {enviando ? 'Enviando...' : 'Escolher imagem'}
-            <input type="file" accept="image/*" onChange={handleUpload} disabled={enviando} style={{ display: 'none' }} />
-          </label>
+
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          {/* Prévia da imagem escolhida (só aparece depois de escolher) */}
+          {previaUrl && (
+            <div style={{ width: 72, height: 72, borderRadius: 'var(--radius-md, 8px)', overflow: 'hidden', flexShrink: 0, border: '1px solid var(--border-default)' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={previaUrl} alt="Prévia" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </div>
+          )}
+
+          <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <input
+              type="text"
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              placeholder="Descrição/tag (ex: consultório, sorriso paciente)"
+              style={{
+                border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)',
+                padding: '8px 12px', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)',
+                background: 'var(--surface-card)', color: 'var(--text-body)',
+              }}
+            />
+
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <label
+                style={{
+                  fontSize: 'var(--text-sm)', padding: '8px 16px', borderRadius: 'var(--radius-pill)',
+                  border: '1px solid var(--border-default)', background: 'var(--surface-card)', color: 'var(--text-strong)',
+                  cursor: 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, whiteSpace: 'nowrap',
+                }}
+              >
+                {arquivoEscolhido ? 'Trocar imagem' : 'Escolher imagem'}
+                <input type="file" accept="image/*" onChange={handleEscolherArquivo} style={{ display: 'none' }} />
+              </label>
+
+              {arquivoEscolhido && (
+                <>
+                  <button
+                    onClick={handleSalvar}
+                    disabled={enviando}
+                    style={{
+                      fontSize: 'var(--text-sm)', padding: '8px 16px', borderRadius: 'var(--radius-pill)', border: 'none',
+                      background: enviando ? 'var(--surface-sunken)' : 'var(--brand)', color: enviando ? 'var(--text-faint)' : 'white',
+                      cursor: enviando ? 'wait' : 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500,
+                    }}
+                  >
+                    {enviando ? 'Salvando...' : 'Salvar'}
+                  </button>
+                  <button
+                    onClick={cancelarEscolha}
+                    disabled={enviando}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 'var(--text-sm)', fontFamily: 'var(--font-sans)' }}
+                  >
+                    Cancelar
+                  </button>
+                </>
+              )}
+            </div>
+            {arquivoEscolhido && (
+              <p style={{ margin: 0, fontSize: 'var(--text-xs)', color: 'var(--text-faint)' }}>
+                {arquivoEscolhido.name}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

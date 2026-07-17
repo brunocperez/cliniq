@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
@@ -20,6 +20,13 @@ interface PostCriado {
   criado_em: string
 }
 
+interface ImagemBanco {
+  id: string
+  imagem_path: string
+  descricao: string | null
+  url?: string
+}
+
 interface Props {
   onFechar: () => void
   onCriado: (post: PostCriado) => void
@@ -36,6 +43,34 @@ export default function CriarPostModal({ onFechar, onCriado }: Props) {
   const { mostrarToast } = useToast()
   const [ideia, setIdeia] = useState('')
   const [loading, setLoading] = useState(false)
+  const [imagens, setImagens] = useState<ImagemBanco[]>([])
+  const [imagemSelecionada, setImagemSelecionada] = useState<string | null>(null)
+  const [buscaImagem, setBuscaImagem] = useState('')
+
+  // Carrega as imagens do banco pra o dentista poder escolher uma
+  useEffect(() => {
+    let cancelado = false
+    async function carregar() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('imagens_marketing')
+        .select('id, imagem_path, descricao')
+        .order('criado_em', { ascending: false })
+      if (!cancelado && data) {
+        const comUrls = await Promise.all(
+          data.map(async (img) => {
+            const { data: signed } = await supabase.storage
+              .from('imagens_marketing')
+              .createSignedUrl(img.imagem_path, 3600)
+            return { ...img, url: signed?.signedUrl }
+          })
+        )
+        setImagens(comUrls as ImagemBanco[])
+      }
+    }
+    carregar()
+    return () => { cancelado = true }
+  }, [])
 
   async function handleCriar() {
     if (!ideia.trim()) {
@@ -48,7 +83,7 @@ export default function CriarPostModal({ onFechar, onCriado }: Props) {
       const { data: profile } = await supabase.from('profiles').select('tenant_id').single()
       if (!profile?.tenant_id) throw new Error('sem tenant')
 
-      // A IA gera legenda + arte a partir da ideia
+      // A IA gera legenda + arte a partir da ideia (e da imagem base, quando real)
       const conteudo = await gerarConteudoPost(ideia)
 
       const { data, error } = await supabase
@@ -63,6 +98,7 @@ export default function CriarPostModal({ onFechar, onCriado }: Props) {
           status: 'rascunho',
           prioridade: 'normal',
           origem: 'sugestao',
+          imagem_base_id: imagemSelecionada,
         })
         .select('*')
         .single()
@@ -96,6 +132,62 @@ export default function CriarPostModal({ onFechar, onCriado }: Props) {
             A IA vai transformar sua ideia numa legenda profissional e gerar a arte.
           </p>
         </div>
+
+        {/* Seletor opcional de imagem do banco, com busca */}
+        {imagens.length > 0 && (
+          <div>
+            <label style={labelStyle}>Usar uma imagem do banco? (opcional)</label>
+            <input
+              type="text"
+              value={buscaImagem}
+              onChange={e => setBuscaImagem(e.target.value)}
+              placeholder="Buscar por descrição (ex: sorriso, consultório...)"
+              style={{ ...inputStyle, marginBottom: 8, fontSize: 'var(--text-xs)', padding: '6px 10px' }}
+            />
+            <div
+              style={{
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(64px, 1fr))', gap: 8,
+                maxHeight: 220, overflowY: 'auto', padding: 2,
+                border: '1px solid var(--border-divider)', borderRadius: 'var(--radius-md, 8px)',
+              }}
+            >
+              {imagens
+                .filter(img => !buscaImagem.trim() || (img.descricao ?? '').toLowerCase().includes(buscaImagem.trim().toLowerCase()))
+                .map(img => {
+                  const selecionada = imagemSelecionada === img.id
+                  return (
+                    <button
+                      key={img.id}
+                      type="button"
+                      onClick={() => setImagemSelecionada(selecionada ? null : img.id)}
+                      title={img.descricao ?? ''}
+                      style={{
+                        width: '100%', aspectRatio: '1', borderRadius: 'var(--radius-md, 6px)', overflow: 'hidden',
+                        border: `2px solid ${selecionada ? 'var(--brand)' : 'var(--border-default)'}`,
+                        padding: 0, cursor: 'pointer', background: 'var(--surface-sunken)',
+                        outline: selecionada ? '2px solid var(--brand)' : 'none', outlineOffset: 1,
+                      }}
+                    >
+                      {img.url && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={img.url} alt={img.descricao ?? ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      )}
+                    </button>
+                  )
+                })}
+              {imagens.filter(img => !buscaImagem.trim() || (img.descricao ?? '').toLowerCase().includes(buscaImagem.trim().toLowerCase())).length === 0 && (
+                <p style={{ gridColumn: '1 / -1', fontSize: 'var(--text-xs)', color: 'var(--text-faint)', margin: '8px 0', textAlign: 'center' }}>
+                  Nenhuma imagem encontrada para &quot;{buscaImagem}&quot;
+                </p>
+              )}
+            </div>
+            {imagemSelecionada && (
+              <p style={{ margin: '6px 0 0', fontSize: 'var(--text-xs)', color: 'var(--brand)' }}>
+                Imagem selecionada — a IA usará ela como base. Clique de novo para desmarcar.
+              </p>
+            )}
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <Button variant="secondary" onClick={onFechar} disabled={loading}>Cancelar</Button>
