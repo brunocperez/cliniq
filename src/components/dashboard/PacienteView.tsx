@@ -8,6 +8,7 @@ import ConsultaNotes from '@/components/dashboard/ConsultaNotes'
 import Odontograma from '@/components/dashboard/Odontograma'
 import PlanoTratamento from '@/components/dashboard/PlanoTratamento'
 import OdontogramaSnapshots from '@/components/dashboard/OdontogramaSnapshots'
+import RadiografiaIA from '@/components/dashboard/RadiografiaIA'
 
 type Status = 'agendado' | 'confirmado' | 'realizado' | 'faltou' | 'cancelado'
 type Aba = 'resumo' | 'odontograma' | 'plano'| 'historico'
@@ -191,6 +192,7 @@ export default function PacienteView({ paciente, consultas }: Props) {
               pacienteNome={paciente.name}
               pacienteTelefone={paciente.phone}
                   odontogramaInicial={(paciente.odontograma as unknown as Record<string, import('@/components/dashboard/Odontograma').DenteData>) ?? {}}        />
+          <RadiografiaIA pacienteId={paciente.id} />
           <OdontogramaSnapshots pacienteId={paciente.id} />
         </>
       )}
